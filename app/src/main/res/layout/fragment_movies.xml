@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_movies"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ru.tersoft.popmoviesapp.MoviesActivityFragment"
+    tools:showIn="@layout/activity_movies">
+
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:columnWidth="150dp"
+        android:id="@+id/movielist"
+        android:numColumns="auto_fit" />
+</RelativeLayout>
