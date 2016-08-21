@@ -1,12 +1,14 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 public class MoviesActivityFragment extends Fragment {
@@ -63,6 +65,14 @@ public class MoviesActivityFragment extends Fragment {
                         loadMovies(params);
                     }
                 }
+            }
+        });
+        movieList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
+                detailIntent.putExtra("position", i);
+                startActivity(detailIntent);
             }
         });
         if(Data.getMoviesNum() == 0) {

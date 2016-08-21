@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
     /*
@@ -64,8 +62,7 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
         mFragmentCallback.onTaskDone();
     }
 
-    public List<MovieInfo> readMovieArray(JsonReader reader) throws IOException {
-        List<MovieInfo> movies = new ArrayList<>();
+    public void readMovieArray(JsonReader reader) throws IOException {
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -77,25 +74,24 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
                 reader.endArray();
             } else reader.skipValue();
         }
-        return movies;
     }
 
     public MovieInfo readMovieInfo(JsonReader reader) throws IOException {
         String path = null;
-        String title = null;
+        long id = 0;
 
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
             if (name.equals("poster_path")) {
                 path = reader.nextString();
-            } else if (name.equals("title")) {
-                title = reader.nextString();
+            } else if (name.equals("id")) {
+                id = reader.nextLong();
             } else {
                 reader.skipValue();
             }
         }
         reader.endObject();
-        return new MovieInfo(title, path);
+        return new MovieInfo(id, path);
     }
 }
