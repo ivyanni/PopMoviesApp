@@ -1,6 +1,7 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -43,6 +44,7 @@ public class MovieListAdapter extends BaseAdapter {
                 .load(url) //
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.error)
+                .config(Bitmap.Config.RGB_565)
                 .fit()
                 .tag(context) //
                 .into(view);
