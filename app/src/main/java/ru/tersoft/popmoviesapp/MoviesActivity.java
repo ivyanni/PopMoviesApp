@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +19,14 @@ public class MoviesActivity extends AppCompatActivity {
     SharedPreferences sPref;
     final String SORT_METHOD = "sort_method";
     Integer mSortMethod;
+    Fragment mFragment;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mFragment != null)
+            getSupportFragmentManager().putFragment(outState, "movies_fragment", mFragment);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,15 @@ public class MoviesActivity extends AppCompatActivity {
         }
         sPref = getPreferences(MODE_PRIVATE);
         mSortMethod = sPref.getInt(SORT_METHOD, 0);
+
+        // Check configuration changes
+        if (savedInstanceState == null) {
+            MoviesActivityFragment mFragment = new MoviesActivityFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.moviesFragment, mFragment, "movies_fragment").commit();
+        }
+        else {
+            mFragment = getSupportFragmentManager().getFragment(savedInstanceState, "movies_fragment");
+        }
     }
 
     @Override
@@ -71,18 +89,18 @@ public class MoviesActivity extends AppCompatActivity {
                     mEditor.putInt(SORT_METHOD, selectedPosition);
                     mEditor.commit();
                     final MoviesActivityFragment fragment =
-                            (MoviesActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-                    fragment.current_page = 1;
-                    fragment.loadingMore = true;
-                    Object[] params = {getResources().getString(R.string.api_key), selectedPosition, fragment.current_page};
+                            (MoviesActivityFragment) getSupportFragmentManager().findFragmentById(R.id.moviesFragment);
+                    Object[] params = {getResources().getString(R.string.api_key), selectedPosition, 1};
                     // Remove old posters and load new
                     Data.Movies.clear();
                     fragment.movieList.smoothScrollToPosition(0);
                     new MoviesLoader(new MoviesActivityFragment.FragmentCallback() {
                         @Override
-                        public void onTaskDone() {
-                            fragment.loadingMore = false;
-                            fragment.current_page += 1;
+                        public void onTaskDone(int i) {
+                            if(i == 1) { // SocketTimeoutException
+                                Toast.makeText(getBaseContext(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
                             fragment.mAdapter.refreshData();
                         }
                     }).execute(params);

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
@@ -39,6 +40,7 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
             connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(1500);
             connection.setRequestMethod("GET");
             // Reading answer with JsonReader
             InputStream is = connection.getInputStream();
@@ -48,9 +50,12 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
             } finally {
                 jsonReader.close();
             }
+        } catch (SocketTimeoutException e) {
+            return 1;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             if (connection != null) {
                 connection.disconnect();
             }
@@ -59,7 +64,7 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
     }
 
     protected void onPostExecute(Integer i) {
-        mFragmentCallback.onTaskDone();
+        mFragmentCallback.onTaskDone(i);
     }
 
     public void readMovieArray(JsonReader reader) throws IOException {

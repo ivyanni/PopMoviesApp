@@ -1,14 +1,30 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.AbsListView;
 
 import com.squareup.picasso.Picasso;
 
 public abstract class GridScrollListener implements AbsListView.OnScrollListener {
-    private final Context context;
 
-    public GridScrollListener(Context context) {
+    private final Context context;
+    // The minimum number of items to have below your current scroll position
+    // before loading more.
+    private int visibleThreshold = 5;
+    // The current offset index of data you have loaded
+    private int currentPage = 0;
+    // The total number of items in the dataset after the last load
+    private int previousTotalItemCount = 0;
+    // True if we are still waiting for the last set of data to load.
+    private boolean loading = true;
+    // Sets the starting page index
+    private int startingPageIndex = 0;
+
+    public GridScrollListener(int visibleThreshold, int startPage, Context context) {
+        this.visibleThreshold = visibleThreshold;
+        this.startingPageIndex = 1;
+        this.currentPage = startPage;
         this.context = context;
     }
 
@@ -25,11 +41,30 @@ public abstract class GridScrollListener implements AbsListView.OnScrollListener
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
-        // Pre-loading next page when user near the end of current page (3 images before the end)
-        if ((firstVisibleItem + visibleItemCount + 3) >= totalItemCount) {
-            onLoadMore();
+        // If the total item count is zero and the previous isn't, assume the
+        // list is invalidated and should be reset back to initial state
+        if (totalItemCount < previousTotalItemCount) {
+            this.currentPage = this.startingPageIndex;
+            this.previousTotalItemCount = totalItemCount;
+            if (totalItemCount == 0) { this.loading = true; }
+        }
+
+        // If it's still loading, we check to see if the dataset count has
+        // changed, if so we conclude it has finished loading and update the current page
+        // number and total item count.
+        if (loading && (totalItemCount > previousTotalItemCount)) {
+            loading = false;
+            previousTotalItemCount = totalItemCount;
+        }
+
+        // If it isn't currently loading, we check to see if we have breached
+        // the visibleThreshold and need to reload more data.
+        // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+        if (!loading && (firstVisibleItem + visibleItemCount + visibleThreshold) >= totalItemCount ) {
+            currentPage++;
+            loading = onLoadMore(currentPage, totalItemCount);
         }
     }
 
-    public abstract void onLoadMore();
+    public abstract boolean onLoadMore(int page, int totalItemsCount);
 }
