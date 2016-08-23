@@ -24,30 +24,10 @@
             android:text="@string/information" />
 
         <LinearLayout
-            android:id="@+id/budgetLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_attach_money_black_18dp"
-                android:layout_gravity="start"
-                android:id="@+id/budgetImage" />
-
-            <TextView
-                android:layout_marginLeft="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/budgetText" />
-
-        </LinearLayout>
-        <LinearLayout
             android:id="@+id/dateLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp" >
+            android:layout_marginTop="16dp" >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -84,6 +64,26 @@
 
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/budgetLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_attach_money_black_18dp"
+                android:layout_gravity="start"
+                android:id="@+id/budgetImage" />
+
+            <TextView
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/budgetText" />
+
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/genresLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -101,6 +101,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/genresText" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/homeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_home_black_18dp"
+                android:layout_gravity="start"
+                android:id="@+id/homeImage" />
+
+            <TextView
+                android:autoLink="web"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/homeText" />
 
         </LinearLayout>
     </LinearLayout>

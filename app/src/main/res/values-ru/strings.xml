@@ -12,7 +12,8 @@
     <string name="title_activity_detail">Детали</string>
     <string name="title_activity_movies">Популярные фильмы</string>
     <string name="information">Информация</string>
-    <string name="hour_abb">" ч"</string>
+    <string name="hour_abb">" ч."</string>
     <string name="million_abb">" млн"</string>
-    <string name="minute_abb">" мин"</string>
+    <string name="minute_abb">" мин."</string>
+    <string name="thousands_abb">" тыс."</string>
 </resources>

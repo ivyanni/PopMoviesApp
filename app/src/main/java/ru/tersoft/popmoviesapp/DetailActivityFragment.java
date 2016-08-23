@@ -22,7 +22,6 @@ public class DetailActivityFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<String> mDataset = new ArrayList<>();
     private List<Integer> mDataSetTypes = new ArrayList<>();
     View v;
 
@@ -63,30 +62,27 @@ public class DetailActivityFragment extends Fragment {
             @Override
             public void onTaskDone() {
                 // Callback from MovieInfoLoader task
-            /*    mDataset.clear();*/ mDataSetTypes.clear();
-                if(mMovieInfo.mDesc != null) {
-                 //   mDataset.add(mMovieInfo.mDesc);
-                   mDataSetTypes.add(0);
+                if(getActivity() != null) {
+                    mDataSetTypes.clear();
+                    if (mMovieInfo.mDesc != null) {
+                        mDataSetTypes.add(0);
+                    }
+                    mDataSetTypes.add(1);
+                    mDataSetTypes.add(2);
+                    String mBackdropPath = mMovieInfo.mBackdropPath;
+                    String mName = mMovieInfo.mName;
+                    CollapsingToolbarLayout collapsingToolbar =
+                            (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
+                    collapsingToolbar.setTitle(mName);
+                    // Load backdrop image to toolbar
+                    ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
+                    Picasso.with(getActivity())
+                            .load(mBackdropPath)
+                            .config(Bitmap.Config.RGB_565)
+                            .tag(getActivity())
+                            .into(backdropView);
+                    mAdapter.notifyDataSetChanged();
                 }
-               // mDataset.add(" ");
-                mDataSetTypes.add(2);
-                String mBackdropPath = mMovieInfo.mBackdropPath;
-                String mName = mMovieInfo.mName;
-              //  float mRating = mMovieInfo.mRating;
-               /* mDataset.add(Float.toString(mRating));*/ mDataSetTypes.add(1);
-                // All variables are set
-                // Set activity's title
-                CollapsingToolbarLayout collapsingToolbar =
-                        (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
-                collapsingToolbar.setTitle(mName);
-                // Load backdrop image to toolbar
-                ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
-                Picasso.with(getActivity())
-                        .load(mBackdropPath)
-                        .config(Bitmap.Config.RGB_565)
-                        .tag(getActivity())
-                        .into(backdropView);
-                mAdapter.notifyDataSetChanged();
             }
         });
         testAsyncTask.execute(params);

@@ -21,8 +21,8 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     private Context mContext;
 
     public static final int DESC = 0; // Description
-    public static final int RATING = 1; // Movie rating
-    public static final int INFO = 2; // Movie additional info
+    public static final int INFO = 1; // Movie additional info
+    public static final int RATING = 2; // Movie rating
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -48,18 +48,21 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     }
 
     public class InfoViewHolder extends ViewHolder {
-        TextView budget, time, date, genres;
-        LinearLayout budgetLayout, timeLayout, dateLayout, genresLayout;
+        TextView budget, time, date, genres, home;
+        // Initialize layouts to hide them
+        LinearLayout budgetLayout, timeLayout, dateLayout, genresLayout, homeLayout;
         public InfoViewHolder(View v) {
             super(v);
             this.budget = (TextView) v.findViewById(R.id.budgetText);
             this.time = (TextView) v.findViewById(R.id.timeText);
             this.date = (TextView) v.findViewById(R.id.dateText);
             this.genres = (TextView) v.findViewById(R.id.genresText);
+            this.home = (TextView) v.findViewById(R.id.homeText);
             this.budgetLayout = (LinearLayout) v.findViewById(R.id.budgetLayout);
             this.timeLayout = (LinearLayout) v.findViewById(R.id.timeLayout);
             this.dateLayout = (LinearLayout) v.findViewById(R.id.dateLayout);
             this.genresLayout = (LinearLayout) v.findViewById(R.id.genresLayout);
+            this.homeLayout = (LinearLayout) v.findViewById(R.id.homeLayout);
         }
     }
 
@@ -100,16 +103,20 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
         if (viewHolder.getItemViewType() == DESC) {
             DescriptionViewHolder descHolder = (DescriptionViewHolder) viewHolder;
             descHolder.temp.setText(Data.Movies.get(mMovieId).mDesc);
+
         } else if(viewHolder.getItemViewType() == RATING) {
             RatingViewHolder ratingHolder = (RatingViewHolder) viewHolder;
             ratingHolder.rating.setRating(Data.Movies.get(mMovieId).mRating);
+
         } else if(viewHolder.getItemViewType() == INFO) {
             InfoViewHolder infoHolder = (InfoViewHolder) viewHolder;
+
             if(Data.Movies.get(mMovieId).mDate == null) {
                 infoHolder.dateLayout.setVisibility(LinearLayout.GONE);
             } else {
                 infoHolder.date.setText(Data.Movies.get(mMovieId).mDate);
             }
+
             if(Data.Movies.get(mMovieId).mRuntime == 0) {
                 infoHolder.timeLayout.setVisibility(LinearLayout.GONE);
             } else {
@@ -119,14 +126,33 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
                     infoHolder.time
                             .setText(Data.Movies.get(mMovieId).mRuntime + hour_abb);
                 } else infoHolder.time
-                        .setText(Data.Movies.get(mMovieId).mRuntime + hour_abb + " " + Data.Movies.get(mMovieId).mRuntimeExt + minute_abb);
+                        .setText(Data.Movies.get(mMovieId).mRuntime + hour_abb + " "
+                                + Data.Movies.get(mMovieId).mRuntimeExt + minute_abb);
             }
+
             if(Data.Movies.get(mMovieId).mBudget == 0) {
-                infoHolder.budgetLayout.setVisibility(LinearLayout.GONE);
+                if(Data.Movies.get(mMovieId).mBudgetExt == 0) {
+                    infoHolder.budgetLayout.setVisibility(LinearLayout.GONE);
+                }
+                else {
+                    String thousands_abb = mContext.getResources().getString(R.string.thousands_abb);
+                    infoHolder.budget.setText(Long.toString(Data.Movies.get(mMovieId).mBudgetExt)
+                            + thousands_abb);
+                }
             } else {
                 String million_abb = mContext.getResources().getString(R.string.million_abb);
-                infoHolder.budget.setText(Long.toString(Data.Movies.get(mMovieId).mBudget) + million_abb);
+                infoHolder.budget.setText(Long.toString(Data.Movies.get(mMovieId).mBudget)
+                        + million_abb);
             }
+
+            if(Data.Movies.get(mMovieId).mHome == null
+                    || Data.Movies.get(mMovieId).mHome.isEmpty()
+                    || Data.Movies.get(mMovieId).mHome.equals("null")) {
+                infoHolder.homeLayout.setVisibility(LinearLayout.GONE);
+            } else {
+                infoHolder.home.setText(Data.Movies.get(mMovieId).mHome);
+            }
+
             if(Data.Movies.get(mMovieId).mGenres.size() == 0) {
                 infoHolder.genresLayout.setVisibility(LinearLayout.GONE);
             } else {

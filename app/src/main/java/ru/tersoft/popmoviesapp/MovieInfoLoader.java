@@ -58,51 +58,71 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
     }
 
     public void readMovieInfo(JsonReader reader) throws IOException {
+        // Initialize all needed variables
         String mBackdropPath = null, mName = null, mDesc = null;
         String mDate = null; double mRating = 0; int mRuntime = 0;
         long mBudget = 0; List<String> genres = new ArrayList<>();
+        String mHome = null;
 
         reader.beginObject();
         while (reader.hasNext()) {
+
             if(reader.peek() != JsonToken.NULL) {
+
                 String name = reader.nextName();
+
                 if (name.equals("backdrop_path")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mBackdropPath = reader.nextString();
                     } else reader.skipValue();
+
                 } else if (name.equals("title")) {
                     mName = reader.nextString();
+
                 } else if (name.equals("vote_average")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mRating = reader.nextDouble();
                     } else reader.skipValue();
+
                 } else if (name.equals("release_date")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mDate = reader.nextString();
                     } else reader.skipValue();
+
                 } else if (name.equals("overview")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mDesc = reader.nextString();
                     } else reader.skipValue();
+
                 } else if (name.equals("runtime")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mRuntime = reader.nextInt();
                     } else reader.skipValue();
+
+                } else if (name.equals("homepage")) {
+                    if (reader.peek() != JsonToken.NULL) {
+                        mHome = reader.nextString();
+                    } else reader.skipValue();
+
                 } else if (name.equals("budget")) {
                     if(reader.peek() != JsonToken.NULL) {
                         mBudget = reader.nextLong();
                     } else reader.skipValue();
+
                 } else if (name.equals("genres")) {
                     if(reader.peek() != JsonToken.NULL) {
                         genres = readGenres(reader);
                     } else reader.skipValue();
+
                 } else {
                     reader.skipValue();
                 }
+
             } else reader.skipValue();
+
         }
         reader.endObject();
-        mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, (float)mRating, mBudget, mRuntime, genres);
+        mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, (float)mRating, mBudget, mRuntime, genres, mHome);
     }
 
     public List<String> readGenres(JsonReader reader) throws IOException {
@@ -110,7 +130,9 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
 
         reader.beginArray();
         while (reader.hasNext()) {
+
             if(reader.peek() != JsonToken.NULL) {
+
                 reader.beginObject();
                 while (reader.hasNext()) {
                     String name = reader.nextName();
@@ -123,7 +145,9 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
                     }
                 }
                 reader.endObject();
+
             } else reader.skipValue();
+
         }
         reader.endArray();
 

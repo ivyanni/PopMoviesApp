@@ -18,7 +18,7 @@ public class MovieInfo {
     String mName, mCoverPath, mDesc, mBackdropPath;
     String mDate;
     float mRating; int mRuntime; int mRuntimeExt;
-    long mId; long mBudget;
+    long mId; long mBudget; long mBudgetExt; String mHome;
     List<String> mGenres = new ArrayList<>();
 
     public MovieInfo(long id, String path) {
@@ -26,8 +26,10 @@ public class MovieInfo {
         mCoverPath = COVER_BASE + path;
     }
 
-    public void addData(String name, String desc, String backdrop, String date, float rating, long budget, int runtime, List<String> genres) {
-        mName = name; mDesc = desc; mBackdropPath = BACK_BASE + backdrop;
+    public void addData(String name, String desc, String backdrop, String date, float rating, long budget, int runtime, List<String> genres, String home) {
+        mName = name; mDesc = desc;
+        mBackdropPath = BACK_BASE + backdrop;
+        // Format date with user's local pattern
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date releaseDate = df.parse(date);
@@ -39,7 +41,10 @@ public class MovieInfo {
             e.printStackTrace();
             mDate = date;
         }
-        mRating = rating; mRuntime = runtime / 60; mRuntimeExt = runtime % 60; mBudget = budget / 1000000;
+        mRating = rating;
+        mRuntime = runtime / 60; mRuntimeExt = runtime % 60;
+        mBudget = budget / 1000000; mBudgetExt = (budget % 1000000) / 1000;
         mGenres = genres;
+        mHome = home;
     }
 }
