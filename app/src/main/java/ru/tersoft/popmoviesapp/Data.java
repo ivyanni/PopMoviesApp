@@ -9,8 +9,17 @@ final class Data {
     */
 
     static final List<MovieInfo> Movies = new ArrayList<>();
+    static String locale = "en";
 
     public Data() {
+    }
+
+    public static final void changeLanguage(String newLocale) {
+        locale = newLocale;
+    }
+
+    public static final String getLanguage() {
+        return locale;
     }
 
     public static final void addMovie(MovieInfo movie) {

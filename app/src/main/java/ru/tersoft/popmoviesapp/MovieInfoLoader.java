@@ -2,6 +2,7 @@ package ru.tersoft.popmoviesapp;
 
 import android.os.AsyncTask;
 import android.util.JsonReader;
+import android.util.JsonToken;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +28,7 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
         // Parameters: 0 - api key (string), 1 - movie position (int)
         mMovieInfo = Data.Movies.get((int)params[1]);
         String dataUrl = "http://api.themoviedb.org/3/movie/" + mMovieInfo.mId + "?";
-        String dataUrlParameters = "api_key=" + params[0];
+        String dataUrlParameters = "api_key=" + params[0] + "&language=" + Data.getLanguage();
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
             connection = (HttpURLConnection) url.openConnection();
@@ -60,20 +61,30 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
 
         reader.beginObject();
         while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("backdrop_path")) {
-                mBackdropPath = reader.nextString();
-            } else if (name.equals("title")) {
-                mName = reader.nextString();
-            } else if (name.equals("vote_average")) {
-                mRating = reader.nextDouble();
-            } else if (name.equals("release_date")) {
-                mDate = reader.nextString();
-            } else if (name.equals("overview")) {
-                mDesc = reader.nextString();
-            } else {
-                reader.skipValue();
-            }
+            if(reader.peek() != JsonToken.NULL) {
+                String name = reader.nextName();
+                if (name.equals("backdrop_path")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mBackdropPath = reader.nextString();
+                    } else reader.skipValue();
+                } else if (name.equals("title")) {
+                    mName = reader.nextString();
+                } else if (name.equals("vote_average")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mRating = reader.nextDouble();
+                    } else reader.skipValue();
+                } else if (name.equals("release_date")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mDate = reader.nextString();
+                    } else reader.skipValue();
+                } else if (name.equals("overview")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mDesc = reader.nextString();
+                    } else reader.skipValue();
+                } else {
+                    reader.skipValue();
+                }
+            } else reader.skipValue();
         }
         reader.endObject();
         mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, (float)mRating);

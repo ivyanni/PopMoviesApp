@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 public class MoviesActivity extends AppCompatActivity {
     SharedPreferences sPref;
     final String SORT_METHOD = "sort_method";
@@ -32,6 +34,7 @@ public class MoviesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
+        Data.changeLanguage(Locale.getDefault().getLanguage());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Checking active internet connection

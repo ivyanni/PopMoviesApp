@@ -57,7 +57,10 @@ public class DetailActivityFragment extends Fragment {
             public void onTaskDone() {
                 // Callback from MovieInfoLoader task
                 mDataset.clear(); mDataSetTypes.clear();
-                mDataset.add(mMovieInfo.mDesc); mDataSetTypes.add(0);
+                if(mMovieInfo.mDesc != null) {
+                    mDataset.add(mMovieInfo.mDesc);
+                    mDataSetTypes.add(0);
+                }
                 String mBackdropPath = mMovieInfo.mBackdropPath;
                 String mName = mMovieInfo.mName;
                 float mRating = mMovieInfo.mRating;

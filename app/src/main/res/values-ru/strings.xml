@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PopMoviesApp</string>
+    <string name="action_settings">Настройки</string>
+    <string name="noconnection">Это приложение требует активное интернет-соединение. Проверьте настройки и перезагрузите приложение.</string>
+    <string name="desc">Описание</string>
+    <string name="rating">Рейтинг</string>
+    <string name="sort_by_popularity">По популярности</string>
+    <string name="sort_by_rating">По рейтингу</string>
+    <string name="sort_dialog_title">Выбор сортировки</string>
+    <string name="action_sort">Смена сортировки</string>
+    <string name="title_activity_detail">Детали</string>
+    <string name="title_activity_movies">Популярные фильмы</string>
+</resources>

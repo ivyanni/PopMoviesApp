@@ -36,7 +36,7 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
                 break;
         }
         // Parameters: 0 - api key (string), 1 - sort method (int), 2 - current page (int)
-        String dataUrlParameters = "api_key=" + params[0] + "&page=" + current_page;
+        String dataUrlParameters = "api_key=" + params[0] + "&page=" + current_page + "&language=" + Data.getLanguage();
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
             connection = (HttpURLConnection) url.openConnection();
