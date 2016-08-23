@@ -1,5 +1,13 @@
 package ru.tersoft.popmoviesapp;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 public class MovieInfo {
     /*
     MovieInfo class contains all parsed information about movie
@@ -9,16 +17,29 @@ public class MovieInfo {
     static final String BACK_BASE = "http://image.tmdb.org/t/p/w780"; // Bigger resolution for backdrops
     String mName, mCoverPath, mDesc, mBackdropPath;
     String mDate;
-    float mRating;
-    long mId;
+    float mRating; int mRuntime; int mRuntimeExt;
+    long mId; long mBudget;
+    List<String> mGenres = new ArrayList<>();
 
     public MovieInfo(long id, String path) {
         mId = id;
         mCoverPath = COVER_BASE + path;
     }
 
-    public void addData(String name, String desc, String backdrop, String date, float rating) {
+    public void addData(String name, String desc, String backdrop, String date, float rating, long budget, int runtime, List<String> genres) {
         mName = name; mDesc = desc; mBackdropPath = BACK_BASE + backdrop;
-        mDate = date; mRating = rating;
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date releaseDate = df.parse(date);
+            DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+            String dateOut = dateFormatter.format(releaseDate);
+            mDate = dateOut;
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            mDate = date;
+        }
+        mRating = rating; mRuntime = runtime / 60; mRuntimeExt = runtime % 60; mBudget = budget / 1000000;
+        mGenres = genres;
     }
 }

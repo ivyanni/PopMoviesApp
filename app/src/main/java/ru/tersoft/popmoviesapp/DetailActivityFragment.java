@@ -18,6 +18,7 @@ import java.util.List;
 
 public class DetailActivityFragment extends Fragment {
     MovieInfo mMovieInfo;
+    private int mMovieId;
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -40,10 +41,16 @@ public class DetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_detail, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.mainView);
         Bundle args = getArguments();
         if (args != null) {
             int pos = getArguments().getInt("position");
             mMovieInfo = Data.Movies.get(pos);
+            mMovieId = pos;
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mAdapter = new MovieInfoAdapter(mMovieId, mDataSetTypes, getActivity());
+            mRecyclerView.setAdapter(mAdapter);
             // Parameters: 0 - api key (string), 1 - movie position (int)
             Object[] params = {getResources().getString(R.string.api_key), pos};
             loadMovieInfo(params);
@@ -56,15 +63,17 @@ public class DetailActivityFragment extends Fragment {
             @Override
             public void onTaskDone() {
                 // Callback from MovieInfoLoader task
-                mDataset.clear(); mDataSetTypes.clear();
+            /*    mDataset.clear();*/ mDataSetTypes.clear();
                 if(mMovieInfo.mDesc != null) {
-                    mDataset.add(mMovieInfo.mDesc);
-                    mDataSetTypes.add(0);
+                 //   mDataset.add(mMovieInfo.mDesc);
+                   mDataSetTypes.add(0);
                 }
+               // mDataset.add(" ");
+                mDataSetTypes.add(2);
                 String mBackdropPath = mMovieInfo.mBackdropPath;
                 String mName = mMovieInfo.mName;
-                float mRating = mMovieInfo.mRating;
-                mDataset.add(Float.toString(mRating)); mDataSetTypes.add(1);
+              //  float mRating = mMovieInfo.mRating;
+               /* mDataset.add(Float.toString(mRating));*/ mDataSetTypes.add(1);
                 // All variables are set
                 // Set activity's title
                 CollapsingToolbarLayout collapsingToolbar =
@@ -77,11 +86,7 @@ public class DetailActivityFragment extends Fragment {
                         .config(Bitmap.Config.RGB_565)
                         .tag(getActivity())
                         .into(backdropView);
-                mRecyclerView = (RecyclerView) v.findViewById(R.id.mainView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mAdapter = new MovieInfoAdapter(mDataset, mDataSetTypes);
-                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
             }
         });
         testAsyncTask.execute(params);

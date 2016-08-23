@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
     /*
@@ -57,7 +59,8 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
 
     public void readMovieInfo(JsonReader reader) throws IOException {
         String mBackdropPath = null, mName = null, mDesc = null;
-        String mDate = null; double mRating = 0;
+        String mDate = null; double mRating = 0; int mRuntime = 0;
+        long mBudget = 0; List<String> genres = new ArrayList<>();
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -81,12 +84,49 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
                     if(reader.peek() != JsonToken.NULL) {
                         mDesc = reader.nextString();
                     } else reader.skipValue();
+                } else if (name.equals("runtime")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mRuntime = reader.nextInt();
+                    } else reader.skipValue();
+                } else if (name.equals("budget")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        mBudget = reader.nextLong();
+                    } else reader.skipValue();
+                } else if (name.equals("genres")) {
+                    if(reader.peek() != JsonToken.NULL) {
+                        genres = readGenres(reader);
+                    } else reader.skipValue();
                 } else {
                     reader.skipValue();
                 }
             } else reader.skipValue();
         }
         reader.endObject();
-        mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, (float)mRating);
+        mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, (float)mRating, mBudget, mRuntime, genres);
+    }
+
+    public List<String> readGenres(JsonReader reader) throws IOException {
+        List<String> genres = new ArrayList<>();
+
+        reader.beginArray();
+        while (reader.hasNext()) {
+            if(reader.peek() != JsonToken.NULL) {
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (name.equals("name")) {
+                        if (reader.peek() != JsonToken.NULL) {
+                            genres.add(reader.nextString());
+                        } else reader.skipValue();
+                    } else {
+                        reader.skipValue();
+                    }
+                }
+                reader.endObject();
+            } else reader.skipValue();
+        }
+        reader.endArray();
+
+        return genres;
     }
 }

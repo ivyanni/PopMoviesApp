@@ -11,4 +11,8 @@
     <string name="action_sort">Смена сортировки</string>
     <string name="title_activity_detail">Детали</string>
     <string name="title_activity_movies">Популярные фильмы</string>
+    <string name="information">Информация</string>
+    <string name="hour_abb">" ч"</string>
+    <string name="million_abb">" млн"</string>
+    <string name="minute_abb">" мин"</string>
 </resources>
