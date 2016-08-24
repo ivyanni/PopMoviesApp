@@ -20,6 +20,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
+            android:textSize="@dimen/font_size"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:text="@string/desc" />
 
         <TextView
@@ -27,7 +29,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textSize="15sp" />
+            android:textSize="@dimen/font_size"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

@@ -34,7 +34,7 @@ public class MoviesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
-        Data.changeLanguage(Locale.getDefault().getLanguage());
+        Data.setLocale(Locale.getDefault());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Checking active internet connection

@@ -1,13 +1,17 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -49,6 +53,7 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
 
     public class InfoViewHolder extends ViewHolder {
         TextView budget, time, date, genres, home;
+        ImageView flag;
         // Initialize layouts to hide them
         LinearLayout budgetLayout, timeLayout, dateLayout, genresLayout, homeLayout;
         public InfoViewHolder(View v) {
@@ -58,6 +63,7 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
             this.date = (TextView) v.findViewById(R.id.dateText);
             this.genres = (TextView) v.findViewById(R.id.genresText);
             this.home = (TextView) v.findViewById(R.id.homeText);
+            this.flag = (ImageView) v.findViewById(R.id.flagImage);
             this.budgetLayout = (LinearLayout) v.findViewById(R.id.budgetLayout);
             this.timeLayout = (LinearLayout) v.findViewById(R.id.timeLayout);
             this.dateLayout = (LinearLayout) v.findViewById(R.id.dateLayout);
@@ -114,6 +120,13 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
             if(Data.Movies.get(mMovieId).mDate == null) {
                 infoHolder.dateLayout.setVisibility(LinearLayout.GONE);
             } else {
+                Picasso.with(mContext)
+                        .load("http://www.translatorscafe.com/cafe/images/flags/"
+                                + (Data.Movies.get(mMovieId).mIsLocal ? Data.getLocale().getCountry() : "US")
+                                + ".gif")
+                        .config(Bitmap.Config.RGB_565)
+                        .tag(mContext)
+                        .into(infoHolder.flag);
                 infoHolder.date.setText(Data.Movies.get(mMovieId).mDate);
             }
 

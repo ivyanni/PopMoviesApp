@@ -97,7 +97,7 @@ public class MoviesActivityFragment extends Fragment {
                         getActivity().finish();
                     }
                 }
-                mAdapter.refreshData();
+                else mAdapter.refreshData();
             }
         });
         testAsyncTask.execute(params);

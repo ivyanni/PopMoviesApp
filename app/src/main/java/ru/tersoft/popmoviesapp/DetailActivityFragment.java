@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -60,28 +61,35 @@ public class DetailActivityFragment extends Fragment {
     private void loadMovieInfo(Object... params) {
         MovieInfoLoader testAsyncTask = new MovieInfoLoader(new DetailActivityFragment.FragmentCallback() {
             @Override
-            public void onTaskDone() {
+            public void onTaskDone(int i) {
                 // Callback from MovieInfoLoader task
                 if(getActivity() != null) {
-                    mDataSetTypes.clear();
-                    if (mMovieInfo.mDesc != null) {
-                        mDataSetTypes.add(0);
+                    if(i == 1) { // Connect or Socket Exception
+                        if(getActivity() != null) {
+                            Toast.makeText(getActivity(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
+                            getActivity().finish();
+                        }
+                    } else {
+                        mDataSetTypes.clear();
+                        if (mMovieInfo.mDesc != null && !mMovieInfo.mDesc.isEmpty()) {
+                            mDataSetTypes.add(0);
+                        }
+                        mDataSetTypes.add(1);
+                        mDataSetTypes.add(2);
+                        String mBackdropPath = mMovieInfo.mBackdropPath;
+                        String mName = mMovieInfo.mName;
+                        CollapsingToolbarLayout collapsingToolbar =
+                                (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
+                        collapsingToolbar.setTitle(mName);
+                        // Load backdrop image to toolbar
+                        ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
+                        Picasso.with(getActivity())
+                                .load(mBackdropPath)
+                                .config(Bitmap.Config.RGB_565)
+                                .tag(getActivity())
+                                .into(backdropView);
+                        mAdapter.notifyDataSetChanged();
                     }
-                    mDataSetTypes.add(1);
-                    mDataSetTypes.add(2);
-                    String mBackdropPath = mMovieInfo.mBackdropPath;
-                    String mName = mMovieInfo.mName;
-                    CollapsingToolbarLayout collapsingToolbar =
-                            (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
-                    collapsingToolbar.setTitle(mName);
-                    // Load backdrop image to toolbar
-                    ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
-                    Picasso.with(getActivity())
-                            .load(mBackdropPath)
-                            .config(Bitmap.Config.RGB_565)
-                            .tag(getActivity())
-                            .into(backdropView);
-                    mAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -89,6 +97,6 @@ public class DetailActivityFragment extends Fragment {
     }
 
     public interface FragmentCallback {
-        void onTaskDone();
+        void onTaskDone(int i);
     }
 }

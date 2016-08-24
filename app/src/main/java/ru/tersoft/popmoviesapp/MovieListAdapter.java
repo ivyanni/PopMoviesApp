@@ -38,15 +38,16 @@ public class MovieListAdapter extends BaseAdapter {
         if (view == null) {
             view = new ImageView(context);
         }
+        view.setAdjustViewBounds(true);
         Picasso.with(context).cancelRequest(view);
         String url = getItem(position);
-        Picasso.with(context) //
-                .load(url) //
+        Picasso.with(context)
+                .load(url)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.error)
                 .config(Bitmap.Config.RGB_565)
                 .fit()
-                .tag(context) //
+                .tag(context)
                 .into(view);
         return view;
     }

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
@@ -36,12 +35,14 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
                 break;
         }
         // Parameters: 0 - api key (string), 1 - sort method (int), 2 - current page (int)
-        String dataUrlParameters = "api_key=" + params[0] + "&page=" + current_page + "&language=" + Data.getLanguage();
+        String dataUrlParameters = "api_key=" + params[0] + "&page=" +
+                current_page + "&language=" +
+                Data.getLocale().getLanguage();
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(1500);
             connection.setRequestMethod("GET");
+            connection.setConnectTimeout(2000);
             // Reading answer with JsonReader
             InputStream is = connection.getInputStream();
             JsonReader jsonReader = new JsonReader(new InputStreamReader(is, "UTF-8"));
@@ -50,12 +51,9 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
             } finally {
                 jsonReader.close();
             }
-        } catch (SocketTimeoutException e) {
-            return 1;
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
+            return 1;
+        } finally {
             if (connection != null) {
                 connection.disconnect();
             }

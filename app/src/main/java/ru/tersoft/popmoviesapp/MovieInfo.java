@@ -16,7 +16,7 @@ public class MovieInfo {
     static final String COVER_BASE = "http://image.tmdb.org/t/p/w342";
     static final String BACK_BASE = "http://image.tmdb.org/t/p/w780"; // Bigger resolution for backdrops
     String mName, mCoverPath, mDesc, mBackdropPath;
-    String mDate;
+    String mDate; boolean mIsLocal = false;
     float mRating; int mRuntime; int mRuntimeExt;
     long mId; long mBudget; long mBudgetExt; String mHome;
     List<String> mGenres = new ArrayList<>();
@@ -26,14 +26,15 @@ public class MovieInfo {
         mCoverPath = COVER_BASE + path;
     }
 
-    public void addData(String name, String desc, String backdrop, String date, float rating, long budget, int runtime, List<String> genres, String home) {
+    public void addData(String name, String desc, String backdrop, String date, boolean isLocal, float rating, long budget, int runtime, List<String> genres, String home) {
         mName = name; mDesc = desc;
         mBackdropPath = BACK_BASE + backdrop;
+        mIsLocal = isLocal;
         // Format date with user's local pattern
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date releaseDate = df.parse(date);
-            DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+            DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
             String dateOut = dateFormatter.format(releaseDate);
             mDate = dateOut;
         }

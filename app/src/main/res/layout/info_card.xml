@@ -21,6 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
+            android:textSize="@dimen/font_size"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:text="@string/information" />
 
         <LinearLayout
@@ -33,13 +35,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_date_range_black_18dp"
-                android:layout_gravity="start"
+                android:layout_gravity="start|center_vertical"
                 android:id="@+id/dateImage" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="12dp"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/flagImage" />
 
             <TextView
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/font_size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:id="@+id/dateText" />
 
         </LinearLayout>
@@ -60,6 +72,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:id="@+id/timeText" />
 
         </LinearLayout>
@@ -80,6 +94,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:id="@+id/budgetText" />
 
         </LinearLayout>
@@ -100,6 +116,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:id="@+id/genresText" />
 
         </LinearLayout>
@@ -121,6 +139,8 @@
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:id="@+id/homeText" />
 
         </LinearLayout>

@@ -2,6 +2,7 @@ package ru.tersoft.popmoviesapp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 final class Data {
     /*
@@ -9,16 +10,16 @@ final class Data {
     */
 
     static final List<MovieInfo> Movies = new ArrayList<>();
-    static String locale = "en";
+    static Locale locale;
 
     public Data() {
     }
 
-    public static final void changeLanguage(String newLocale) {
+    public static final void setLocale(Locale newLocale) {
         locale = newLocale;
     }
 
-    public static final String getLanguage() {
+    public static final Locale getLocale() {
         return locale;
     }
 
