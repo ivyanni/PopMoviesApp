@@ -20,62 +20,61 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     Adapter for RecyclerView that contains different CardViews
     */
 
-    private int mMovieId;
-    private List<Integer> mDataSetTypes;
+    private int mMoviePosition;
+    private List<Integer> mCardTypes;
     private Context mContext;
 
-    public static final int DESC = 0; // Description
-    public static final int INFO = 1; // Movie additional info
-    public static final int RATING = 2; // Movie rating
+    private static final int DESC = 0; // Description
+    private static final int INFO = 1; // Movie additional info
+    private static final int RATING = 2; // Movie rating
 
+    MovieInfoAdapter(int movieId, List<Integer> dataSetTypes, Context context) {
+        mMoviePosition = movieId;
+        mCardTypes = dataSetTypes;
+        mContext = context;
+    }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View v) {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ViewHolder(View v) {
             super(v);
         }
     }
 
-    public class DescriptionViewHolder extends ViewHolder {
+    private class DescriptionViewHolder extends ViewHolder {
         TextView temp;
-        public DescriptionViewHolder(View v) {
+        DescriptionViewHolder(View v) {
             super(v);
             this.temp = (TextView) v.findViewById(R.id.desc);
         }
     }
 
-    public class RatingViewHolder extends ViewHolder {
+    private class RatingViewHolder extends ViewHolder {
         RatingBar rating;
-        public RatingViewHolder(View v) {
+        RatingViewHolder(View v) {
             super(v);
             this.rating = (RatingBar) v.findViewById(R.id.ratingBar);
         }
     }
 
-    public class InfoViewHolder extends ViewHolder {
-        TextView budget, time, date, genres, home;
-        ImageView flag;
-        // Initialize layouts to hide them
+    private class InfoViewHolder extends ViewHolder {
+        TextView budgetTextView, timeTextView, dateTextView, genresTextView, homeTextView;
+        ImageView flagImageView;
         LinearLayout budgetLayout, timeLayout, dateLayout, genresLayout, homeLayout;
-        public InfoViewHolder(View v) {
+
+        InfoViewHolder(View v) {
             super(v);
-            this.budget = (TextView) v.findViewById(R.id.budgetText);
-            this.time = (TextView) v.findViewById(R.id.timeText);
-            this.date = (TextView) v.findViewById(R.id.dateText);
-            this.genres = (TextView) v.findViewById(R.id.genresText);
-            this.home = (TextView) v.findViewById(R.id.homeText);
-            this.flag = (ImageView) v.findViewById(R.id.flagImage);
+            this.budgetTextView = (TextView) v.findViewById(R.id.budgetText);
+            this.timeTextView = (TextView) v.findViewById(R.id.timeText);
+            this.dateTextView = (TextView) v.findViewById(R.id.dateText);
+            this.genresTextView = (TextView) v.findViewById(R.id.genresText);
+            this.homeTextView = (TextView) v.findViewById(R.id.homeText);
+            this.flagImageView = (ImageView) v.findViewById(R.id.flagImage);
             this.budgetLayout = (LinearLayout) v.findViewById(R.id.budgetLayout);
             this.timeLayout = (LinearLayout) v.findViewById(R.id.timeLayout);
             this.dateLayout = (LinearLayout) v.findViewById(R.id.dateLayout);
             this.genresLayout = (LinearLayout) v.findViewById(R.id.genresLayout);
             this.homeLayout = (LinearLayout) v.findViewById(R.id.homeLayout);
         }
-    }
-
-    public MovieInfoAdapter(int movieId, List<Integer> dataSetTypes, Context context) {
-        mMovieId = movieId;
-        mDataSetTypes = dataSetTypes;
-        mContext = context;
     }
 
     @Override
@@ -108,87 +107,92 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         if (viewHolder.getItemViewType() == DESC) {
             DescriptionViewHolder descHolder = (DescriptionViewHolder) viewHolder;
-            descHolder.temp.setText(Data.Movies.get(mMovieId).mDesc);
-
+            descHolder.temp.setText(Data.getMovie(mMoviePosition).mDesc);
         } else if(viewHolder.getItemViewType() == RATING) {
             RatingViewHolder ratingHolder = (RatingViewHolder) viewHolder;
-            ratingHolder.rating.setRating(Data.Movies.get(mMovieId).mRating);
-
+            ratingHolder.rating.setRating(Data.getMovie(mMoviePosition).mRating);
         } else if(viewHolder.getItemViewType() == INFO) {
             InfoViewHolder infoHolder = (InfoViewHolder) viewHolder;
 
-            if(Data.Movies.get(mMovieId).mDate == null) {
+            // Showing movie's release date
+            if(Data.getMovie(mMoviePosition).mDate == null) {
                 infoHolder.dateLayout.setVisibility(LinearLayout.GONE);
             } else {
                 Picasso.with(mContext)
                         .load("http://www.translatorscafe.com/cafe/images/flags/"
-                                + (Data.Movies.get(mMovieId).mIsLocal ? Data.getLocale().getCountry() : "US")
+                                + (Data.getMovie(mMoviePosition).mIsLocal ? Data.getLocale().getCountry() : "US")
                                 + ".gif")
                         .config(Bitmap.Config.RGB_565)
                         .tag(mContext)
-                        .into(infoHolder.flag);
-                infoHolder.date.setText(Data.Movies.get(mMovieId).mDate);
+                        .into(infoHolder.flagImageView);
+                infoHolder.dateTextView.setText(Data.getMovie(mMoviePosition).mDate);
             }
 
-            if(Data.Movies.get(mMovieId).mRuntime == 0) {
+            // Showing movie's runtime
+            if(Data.getMovie(mMoviePosition).mRuntime == 0) {
                 infoHolder.timeLayout.setVisibility(LinearLayout.GONE);
             } else {
                 String hour_abb = mContext.getResources().getString(R.string.hour_abb);
                 String minute_abb = mContext.getResources().getString(R.string.minute_abb);
-                if (Data.Movies.get(mMovieId).mRuntimeExt == 0) {
-                    infoHolder.time
-                            .setText(Data.Movies.get(mMovieId).mRuntime + hour_abb);
-                } else infoHolder.time
-                        .setText(Data.Movies.get(mMovieId).mRuntime + hour_abb + " "
-                                + Data.Movies.get(mMovieId).mRuntimeExt + minute_abb);
+                if (Data.getMovie(mMoviePosition).mRuntimeExt == 0) {
+                    infoHolder.timeTextView
+                            .setText(Data.getMovie(mMoviePosition).mRuntime + hour_abb);
+                } else infoHolder.timeTextView
+                        .setText(Data.getMovie(mMoviePosition).mRuntime + hour_abb + " "
+                                + Data.getMovie(mMoviePosition).mRuntimeExt + minute_abb);
             }
 
-            if(Data.Movies.get(mMovieId).mBudget == 0) {
-                if(Data.Movies.get(mMovieId).mBudgetExt == 0) {
+            // Showing movie's budget
+            if(Data.getMovie(mMoviePosition).mBudget == 0) {
+                if(Data.getMovie(mMoviePosition).mBudgetExt == 0) {
                     infoHolder.budgetLayout.setVisibility(LinearLayout.GONE);
                 }
                 else {
+                    // Movie's budget less than 1 million
                     String thousands_abb = mContext.getResources().getString(R.string.thousands_abb);
-                    infoHolder.budget.setText(Long.toString(Data.Movies.get(mMovieId).mBudgetExt)
+                    infoHolder.budgetTextView.setText(Long.toString(Data.getMovie(mMoviePosition).mBudgetExt)
                             + thousands_abb);
                 }
             } else {
+                // Movie's budget more than 1 million
                 String million_abb = mContext.getResources().getString(R.string.million_abb);
-                infoHolder.budget.setText(Long.toString(Data.Movies.get(mMovieId).mBudget)
+                infoHolder.budgetTextView.setText(Long.toString(Data.getMovie(mMoviePosition).mBudget)
                         + million_abb);
             }
 
-            if(Data.Movies.get(mMovieId).mHome == null
-                    || Data.Movies.get(mMovieId).mHome.isEmpty()
-                    || Data.Movies.get(mMovieId).mHome.equals("null")) {
+            // Showing movie's homepage
+            if(Data.getMovie(mMoviePosition).mHome == null
+                    || Data.getMovie(mMoviePosition).mHome.isEmpty()
+                    || Data.getMovie(mMoviePosition).mHome.equals("null")) {
                 infoHolder.homeLayout.setVisibility(LinearLayout.GONE);
             } else {
-                infoHolder.home.setText(Data.Movies.get(mMovieId).mHome);
+                infoHolder.homeTextView.setText(Data.getMovie(mMoviePosition).mHome);
             }
 
-            if(Data.Movies.get(mMovieId).mGenres.size() == 0) {
+            // Showing movie genres list
+            if(Data.getMovie(mMoviePosition).mGenres.size() == 0) {
                 infoHolder.genresLayout.setVisibility(LinearLayout.GONE);
             } else {
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                while(i < Data.Movies.get(mMovieId).mGenres.size()-1) {
-                    sb.append(Data.Movies.get(mMovieId).mGenres.get(i));
+                while(i < Data.getMovie(mMoviePosition).mGenres.size()-1) {
+                    sb.append(Data.getMovie(mMoviePosition).mGenres.get(i));
                     sb.append(", ");
                     i++;
                 }
-                sb.append(Data.Movies.get(mMovieId).mGenres.get(i));
-                infoHolder.genres.setText(sb.toString());
+                sb.append(Data.getMovie(mMoviePosition).mGenres.get(i));
+                infoHolder.genresTextView.setText(sb.toString());
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        return mDataSetTypes.size();
+        return mCardTypes.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mDataSetTypes.get(position);
+        return mCardTypes.get(position);
     }
 }

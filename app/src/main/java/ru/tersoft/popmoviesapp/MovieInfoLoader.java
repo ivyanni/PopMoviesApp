@@ -12,34 +12,35 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
+public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
     /*
     AsyncTask that loads all needed movie info and makes a callback to DetailActivityFragment
     */
 
-    HttpURLConnection connection;
-    MovieInfo mMovieInfo;
+    private HttpURLConnection mConnection;
+    private MovieInfo mMovie;
 
     private DetailActivityFragment.FragmentCallback mFragmentCallback;
 
-    public MovieInfoLoader(DetailActivityFragment.FragmentCallback fragmentCallback) {
+    MovieInfoLoader(DetailActivityFragment.FragmentCallback fragmentCallback) {
         mFragmentCallback = fragmentCallback;
     }
 
-    protected Integer doInBackground(Object... params) {
+    protected Boolean doInBackground(Object... params) {
         // Parameters: 0 - api key (string), 1 - movie position (int)
-        mMovieInfo = Data.Movies.get((int)params[1]);
-        String dataUrl = "http://api.themoviedb.org/3/movie/" + mMovieInfo.mId + "?";
+        mMovie = Data.getMovie((int)params[1]);
+        String dataUrl = "http://api.themoviedb.org/3/movie/" + mMovie.mId + "?";
         String dataUrlParameters = "api_key=" + params[0] +
                 "&language=" + Data.getLocale().getLanguage() +
                 "&append_to_response=releases";
+
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(2000);
+            mConnection = (HttpURLConnection) url.openConnection();
+            mConnection.setRequestMethod("GET");
+            mConnection.setConnectTimeout(2000);
             // Reading answer with JsonReader
-            InputStream is = connection.getInputStream();
+            InputStream is = mConnection.getInputStream();
             JsonReader jsonReader = new JsonReader(new InputStreamReader(is, "UTF-8"));
             try {
                 readMovieInfo(jsonReader);
@@ -47,25 +48,28 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
                 jsonReader.close();
             }
         } catch (Exception e) {
-            return 1;
+            return false;
         } finally {
-            if (connection != null) {
-                connection.disconnect();
+            if (mConnection != null) {
+                mConnection.disconnect();
             }
         }
-        return 0;
+        return true;
     }
 
-    protected void onPostExecute(Integer i) {
+    protected void onPostExecute(Boolean i) {
         mFragmentCallback.onTaskDone(i);
     }
 
     public void readMovieInfo(JsonReader reader) throws IOException {
         // Initialize all needed variables
-        String mBackdropPath = null, mName = null, mDesc = null;
-        String mDate = null; double mRating = 0; int mRuntime = 0;
-        long mBudget = 0; List<String> genres = new ArrayList<>();
-        String mHome = null; String localReleaseDate; boolean isLocal = false;
+        String backdropPath = null, movieName = null, desc = null,
+                home = null, localReleaseDate, date = null;
+        double rating = 0;
+        int runtime = 0;
+        long budget = 0;
+        List<String> genres = new ArrayList<>();
+        boolean isLocal = false;
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -74,77 +78,90 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
 
                 String name = reader.nextName();
 
-                if (name.equals("backdrop_path")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mBackdropPath = reader.nextString();
-                    } else reader.skipValue();
+                switch (name) {
+                    case "backdrop_path":
+                        // Backdrop image
+                        if (reader.peek() != JsonToken.NULL) {
+                            backdropPath = reader.nextString();
+                        } else reader.skipValue();
+                        break;
+                    case "title":
+                        // Movie's title
+                        movieName = reader.nextString();
+                        break;
+                    case "vote_average":
+                        // Movie's rating
+                        if (reader.peek() != JsonToken.NULL) {
+                            rating = reader.nextDouble();
+                        } else reader.skipValue();
+                        break;
+                    case "release_date":
+                        // Movie's release date in USA
+                        if (reader.peek() != JsonToken.NULL) {
+                            date = reader.nextString();
+                        } else reader.skipValue();
+                        break;
+                    case "overview":
+                        // Movie's description
+                        if (reader.peek() != JsonToken.NULL) {
+                            desc = reader.nextString();
+                        } else reader.skipValue();
+                        break;
+                    case "runtime":
+                        // Movie's runtime
+                        if (reader.peek() != JsonToken.NULL) {
+                            runtime = reader.nextInt();
+                        } else reader.skipValue();
+                        break;
+                    case "homepage":
+                        // Movie's homepage url
+                        if (reader.peek() != JsonToken.NULL) {
+                            home = reader.nextString();
+                        } else reader.skipValue();
+                        break;
+                    case "budget":
+                        // Movie's budget
+                        if (reader.peek() != JsonToken.NULL) {
+                            budget = reader.nextLong();
+                        } else reader.skipValue();
+                        break;
+                    case "genres":
+                        // Movie's genres list
+                        if (reader.peek() != JsonToken.NULL) {
+                            genres = readGenres(reader);
+                        } else reader.skipValue();
+                        break;
+                    case "releases":
+                        // Movie's local release date by country code
+                        if (reader.peek() != JsonToken.NULL) {
+                            localReleaseDate = readReleaseDate(reader);
+                            if (localReleaseDate != null) {
+                                // Found local release date
+                                date = localReleaseDate;
+                                isLocal = true;
+                            }
+                        } else reader.skipValue();
 
-                } else if (name.equals("title")) {
-                    mName = reader.nextString();
-
-                } else if (name.equals("vote_average")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mRating = reader.nextDouble();
-                    } else reader.skipValue();
-
-                } else if (name.equals("release_date")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mDate = reader.nextString();
-                    } else reader.skipValue();
-
-                } else if (name.equals("overview")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mDesc = reader.nextString();
-                    } else reader.skipValue();
-
-                } else if (name.equals("runtime")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mRuntime = reader.nextInt();
-                    } else reader.skipValue();
-
-                } else if (name.equals("homepage")) {
-                    if (reader.peek() != JsonToken.NULL) {
-                        mHome = reader.nextString();
-                    } else reader.skipValue();
-
-                } else if (name.equals("budget")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        mBudget = reader.nextLong();
-                    } else reader.skipValue();
-
-                } else if (name.equals("genres")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        genres = readGenres(reader);
-                    } else reader.skipValue();
-
-                } else if (name.equals("releases")) {
-                    if(reader.peek() != JsonToken.NULL) {
-                        localReleaseDate = readReleaseDate(reader);
-                        if(localReleaseDate != null) {
-                            mDate = localReleaseDate;
-                            isLocal = true;
-                        }
-                    } else reader.skipValue();
-
-                } else {
-                    reader.skipValue();
+                        break;
+                    default:
+                        reader.skipValue();
+                        break;
                 }
 
             } else reader.skipValue();
 
         }
         reader.endObject();
-        mMovieInfo.addData(mName, mDesc, mBackdropPath, mDate, isLocal, (float)mRating, mBudget, mRuntime, genres, mHome);
+        mMovie.addData(movieName, desc, backdropPath, date, isLocal,
+                (float)rating, budget, runtime, genres, home);
     }
 
-    public List<String> readGenres(JsonReader reader) throws IOException {
+    private List<String> readGenres(JsonReader reader) throws IOException {
         List<String> genres = new ArrayList<>();
 
         reader.beginArray();
         while (reader.hasNext()) {
-
             if(reader.peek() != JsonToken.NULL) {
-
                 reader.beginObject();
                 while (reader.hasNext()) {
                     String name = reader.nextName();
@@ -157,17 +174,15 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
                     }
                 }
                 reader.endObject();
-
             } else reader.skipValue();
-
         }
         reader.endArray();
 
         return genres;
     }
 
-    public String readReleaseDate(JsonReader reader) throws IOException {
-        String mReleaseDate = null, mCountryCode = null;
+    private String readReleaseDate(JsonReader reader) throws IOException {
+        String releaseDate = null, countryCode = null;
 
         reader.beginObject();
         reader.nextName();
@@ -175,22 +190,32 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
         while (reader.hasNext()) {
 
             if(reader.peek() != JsonToken.NULL) {
-
                 reader.beginObject();
+                label:
                 while (reader.hasNext()) {
+
                     String name = reader.nextName();
-                    if (name.equals("iso_3166_1")) {
-                        if (reader.peek() != JsonToken.NULL) {
-                            mCountryCode = reader.nextString();
-                        } else reader.skipValue();
-                    } else if (name.equals("release_date")) {
-                        if (reader.peek() != JsonToken.NULL && mCountryCode.equals(Data.getLocale().getCountry())) {
-                            mReleaseDate = reader.nextString();
+                    switch (name) {
+                        case "iso_3166_1":
+                            if (reader.peek() != JsonToken.NULL) {
+                                // Get country code
+                                countryCode = reader.nextString();
+                            } else reader.skipValue();
                             break;
-                        } else reader.skipValue();
-                    } else {
-                        reader.skipValue();
+                        case "release_date":
+                            // Check country code equals device's language
+                            if (countryCode != null) {
+                                if (reader.peek() != JsonToken.NULL && countryCode.equals(Data.getLocale().getCountry())) {
+                                    releaseDate = reader.nextString();
+                                    break label;
+                                } else reader.skipValue();
+                            }
+                            break;
+                        default:
+                            reader.skipValue();
+                            break;
                     }
+
                 }
                 reader.endObject();
 
@@ -200,6 +225,6 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Integer> {
         reader.endArray();
         reader.endObject();
 
-        return mReleaseDate;
+        return releaseDate;
     }
 }

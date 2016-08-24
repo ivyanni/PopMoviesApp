@@ -1,40 +1,39 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.AbsListView;
 
 import com.squareup.picasso.Picasso;
 
 public abstract class GridScrollListener implements AbsListView.OnScrollListener {
 
-    private final Context context;
+    private final Context mContext;
     // The minimum number of items to have below your current scroll position
-    // before loading more.
-    private int visibleThreshold = 5;
+    // before mLoading more.
+    private int mVisibleThreshold = 5;
     // The current offset index of data you have loaded
-    private int currentPage = 0;
+    private int mCurrentPage = 0;
     // The total number of items in the dataset after the last load
-    private int previousTotalItemCount = 0;
+    private int mPreviousTotalItemCount = 0;
     // True if we are still waiting for the last set of data to load.
-    private boolean loading = true;
+    private boolean mLoading = true;
     // Sets the starting page index
-    private int startingPageIndex = 0;
+    private int mStartingPageIndex = 0;
 
-    public GridScrollListener(int visibleThreshold, int startPage, Context context) {
-        this.visibleThreshold = visibleThreshold;
-        this.startingPageIndex = 1;
-        this.currentPage = startPage;
-        this.context = context;
+    GridScrollListener(int visibleThreshold, int startPage, Context context) {
+        this.mVisibleThreshold = visibleThreshold;
+        this.mStartingPageIndex = 1;
+        this.mCurrentPage = startPage;
+        this.mContext = context;
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        final Picasso picasso = Picasso.with(context);
+        final Picasso picasso = Picasso.with(mContext);
         if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-            picasso.resumeTag(context);
+            picasso.resumeTag(mContext);
         } else {
-            picasso.pauseTag(context);
+            picasso.pauseTag(mContext);
         }
     }
 
@@ -43,26 +42,26 @@ public abstract class GridScrollListener implements AbsListView.OnScrollListener
                          int totalItemCount) {
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
-        if (totalItemCount < previousTotalItemCount) {
-            this.currentPage = this.startingPageIndex;
-            this.previousTotalItemCount = totalItemCount;
-            if (totalItemCount == 0) { this.loading = true; }
+        if (totalItemCount < mPreviousTotalItemCount) {
+            this.mCurrentPage = this.mStartingPageIndex;
+            this.mPreviousTotalItemCount = totalItemCount;
+            if (totalItemCount == 0) { this.mLoading = true; }
         }
 
-        // If it's still loading, we check to see if the dataset count has
-        // changed, if so we conclude it has finished loading and update the current page
+        // If it's still mLoading, we check to see if the dataset count has
+        // changed, if so we conclude it has finished mLoading and update the current page
         // number and total item count.
-        if (loading && (totalItemCount > previousTotalItemCount)) {
-            loading = false;
-            previousTotalItemCount = totalItemCount;
+        if (mLoading && (totalItemCount > mPreviousTotalItemCount)) {
+            mLoading = false;
+            mPreviousTotalItemCount = totalItemCount;
         }
 
-        // If it isn't currently loading, we check to see if we have breached
-        // the visibleThreshold and need to reload more data.
+        // If it isn't currently mLoading, we check to see if we have breached
+        // the mVisibleThreshold and need to reload more data.
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-        if (!loading && (firstVisibleItem + visibleItemCount + visibleThreshold) >= totalItemCount ) {
-            currentPage++;
-            loading = onLoadMore(currentPage, totalItemCount);
+        if (!mLoading && (firstVisibleItem + visibleItemCount + mVisibleThreshold) >= totalItemCount ) {
+            mCurrentPage++;
+            mLoading = onLoadMore(mCurrentPage, totalItemCount);
         }
     }
 

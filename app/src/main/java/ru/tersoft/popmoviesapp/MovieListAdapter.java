@@ -21,15 +21,15 @@ public class MovieListAdapter extends BaseAdapter {
     private final Context context;
     private final List<String> urls = new ArrayList<>();
 
-    public MovieListAdapter(Context context) {
+    MovieListAdapter(Context context) {
         this.context = context;
         this.urls.clear();
-        urls.addAll(Data.getMoviesPaths());
+        urls.addAll(Data.getCoverPaths());
     }
 
-    public void refreshData() {
+    void refreshData() {
         this.urls.clear();
-        urls.addAll(Data.getMoviesPaths());
+        urls.addAll(Data.getCoverPaths());
         notifyDataSetChanged();
     }
 

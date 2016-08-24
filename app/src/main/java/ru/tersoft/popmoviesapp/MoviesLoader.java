@@ -9,42 +9,43 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
+public class MoviesLoader extends AsyncTask<Object, Object, Boolean> {
     /*
     AsyncTask that loads new content from page and makes a callback to MoviesActivityFragment
     */
 
-    HttpURLConnection connection;
+    private HttpURLConnection mConnection;
 
     private MoviesActivityFragment.FragmentCallback mFragmentCallback;
 
-    public MoviesLoader(MoviesActivityFragment.FragmentCallback fragmentCallback) {
+    MoviesLoader(MoviesActivityFragment.FragmentCallback fragmentCallback) {
         mFragmentCallback = fragmentCallback;
     }
 
-    protected Integer doInBackground(Object... params) {
-        int current_page = (int) params[2];
-        int sort_method = (int) params[1];
+    protected Boolean doInBackground(Object... params) {
+        int currentPage = (int) params[2];
+        int sortMethod = (int) params[1];
         String dataUrl;
-        switch(sort_method) {
-            case 1:
+
+        switch(sortMethod) {
+            case 1: // Sort by rating
                 dataUrl = "http://api.themoviedb.org/3/movie/top_rated?";
                 break;
-            default:
+            default: // Sort by popularity
                 dataUrl = "http://api.themoviedb.org/3/movie/popular?";
                 break;
         }
         // Parameters: 0 - api key (string), 1 - sort method (int), 2 - current page (int)
         String dataUrlParameters = "api_key=" + params[0] + "&page=" +
-                current_page + "&language=" +
+                currentPage + "&language=" +
                 Data.getLocale().getLanguage();
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(2000);
+            mConnection = (HttpURLConnection) url.openConnection();
+            mConnection.setRequestMethod("GET");
+            mConnection.setConnectTimeout(2000);
             // Reading answer with JsonReader
-            InputStream is = connection.getInputStream();
+            InputStream is = mConnection.getInputStream();
             JsonReader jsonReader = new JsonReader(new InputStreamReader(is, "UTF-8"));
             try {
                 readMovieArray(jsonReader);
@@ -52,20 +53,20 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
                 jsonReader.close();
             }
         } catch (Exception e) {
-            return 1;
+            return false;
         } finally {
-            if (connection != null) {
-                connection.disconnect();
+            if (mConnection != null) {
+                mConnection.disconnect();
             }
         }
-        return 0;
+        return true;
     }
 
-    protected void onPostExecute(Integer i) {
+    protected void onPostExecute(Boolean i) {
         mFragmentCallback.onTaskDone(i);
     }
 
-    public void readMovieArray(JsonReader reader) throws IOException {
+    private void readMovieArray(JsonReader reader) throws IOException {
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -79,22 +80,26 @@ public class MoviesLoader extends AsyncTask<Object, Object, Integer> {
         }
     }
 
-    public MovieInfo readMovieInfo(JsonReader reader) throws IOException {
-        String path = null;
-        long id = 0;
+    private MovieInfo readMovieInfo(JsonReader reader) throws IOException {
+        String coverPath = null;
+        long movieId = 0;
 
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("poster_path")) {
-                path = reader.nextString();
-            } else if (name.equals("id")) {
-                id = reader.nextLong();
-            } else {
-                reader.skipValue();
+            switch (name) {
+                case "poster_path":
+                    coverPath = reader.nextString();
+                    break;
+                case "id":
+                    movieId = reader.nextLong();
+                    break;
+                default:
+                    reader.skipValue();
+                    break;
             }
         }
         reader.endObject();
-        return new MovieInfo(id, path);
+        return new MovieInfo(movieId, coverPath);
     }
 }

@@ -18,33 +18,33 @@ import android.widget.Toast;
 import java.util.Locale;
 
 public class MoviesActivity extends AppCompatActivity {
-    SharedPreferences sPref;
-    final String SORT_METHOD = "sort_method";
-    Integer mSortMethod;
-    Fragment mFragment;
+    private SharedPreferences sPref;
+    private static final String SORT_METHOD = "sort_method";
+    private Integer mSortMethod;
+    private Fragment mFragment;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(mFragment != null)
+        if(mFragment != null) {
             getSupportFragmentManager().putFragment(outState, "movies_fragment", mFragment);
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
-        Data.setLocale(Locale.getDefault());
+        Data.setLocale(Locale.getDefault()); // Get device's locale
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Checking active internet connection
+        // Checking active internet mConnection
         if(!isOnline()) {
             Toast.makeText(this, getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
             finish();
         }
         sPref = getPreferences(MODE_PRIVATE);
         mSortMethod = sPref.getInt(SORT_METHOD, 0);
-
         // Check configuration changes
         if (savedInstanceState == null) {
             MoviesActivityFragment mFragment = new MoviesActivityFragment();
@@ -64,7 +64,6 @@ public class MoviesActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_sort:
                 showSortDialog();
@@ -90,21 +89,21 @@ public class MoviesActivity extends AppCompatActivity {
                     sPref = getPreferences(MODE_PRIVATE);
                     SharedPreferences.Editor mEditor = sPref.edit();
                     mEditor.putInt(SORT_METHOD, selectedPosition);
-                    mEditor.commit();
-                    final MoviesActivityFragment fragment =
+                    mEditor.apply();
+                    final MoviesActivityFragment moviesFragment =
                             (MoviesActivityFragment) getSupportFragmentManager().findFragmentById(R.id.moviesFragment);
                     Object[] params = {getResources().getString(R.string.api_key), selectedPosition, 1};
                     // Remove old posters and load new
-                    Data.Movies.clear();
-                    fragment.movieList.smoothScrollToPosition(0);
+                    Data.removeAllMovies();
+                    moviesFragment.movieList.smoothScrollToPosition(0);
                     new MoviesLoader(new MoviesActivityFragment.FragmentCallback() {
                         @Override
-                        public void onTaskDone(int i) {
-                            if(i == 1) { // SocketTimeoutException
+                        public void onTaskDone(boolean result) {
+                            if(!result) { // SocketTimeoutException
                                 Toast.makeText(getBaseContext(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
-                            fragment.mAdapter.refreshData();
+                            else moviesFragment.adapter.refreshData();
                         }
                     }).execute(params);
                 }

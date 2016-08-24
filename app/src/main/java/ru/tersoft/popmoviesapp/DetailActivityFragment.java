@@ -18,38 +18,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailActivityFragment extends Fragment {
-    MovieInfo mMovieInfo;
-    private int mMovieId;
-    private RecyclerView mRecyclerView;
+    private MovieInfo mMovie;
     private MovieInfoAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private List<Integer> mDataSetTypes = new ArrayList<>();
+    private List<Integer> mDataSetTypes = new ArrayList<>(); // CardView order
     View v;
-
-    public DetailActivityFragment() {
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // This makes AsyncTask not to stuck after changing configuration
-        setRetainInstance(true);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_detail, container, false);
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.mainView);
+        RecyclerView mRecyclerView = (RecyclerView) v.findViewById(R.id.mainView);
+        // Get position in GridView of selected movie
         Bundle args = getArguments();
         if (args != null) {
             int pos = getArguments().getInt("position");
-            mMovieInfo = Data.Movies.get(pos);
-            mMovieId = pos;
-            mLayoutManager = new LinearLayoutManager(getActivity());
+            mMovie = Data.getMovie(pos);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
             mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new MovieInfoAdapter(mMovieId, mDataSetTypes, getActivity());
+            mAdapter = new MovieInfoAdapter(pos, mDataSetTypes, getActivity());
             mRecyclerView.setAdapter(mAdapter);
             // Parameters: 0 - api key (string), 1 - movie position (int)
             Object[] params = {getResources().getString(R.string.api_key), pos};
@@ -61,23 +47,21 @@ public class DetailActivityFragment extends Fragment {
     private void loadMovieInfo(Object... params) {
         MovieInfoLoader testAsyncTask = new MovieInfoLoader(new DetailActivityFragment.FragmentCallback() {
             @Override
-            public void onTaskDone(int i) {
+            public void onTaskDone(boolean result) {
                 // Callback from MovieInfoLoader task
                 if(getActivity() != null) {
-                    if(i == 1) { // Connect or Socket Exception
-                        if(getActivity() != null) {
-                            Toast.makeText(getActivity(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
-                            getActivity().finish();
-                        }
-                    } else {
+                    if(result) {
+                        // Set CardView order
                         mDataSetTypes.clear();
-                        if (mMovieInfo.mDesc != null && !mMovieInfo.mDesc.isEmpty()) {
+                        if (mMovie.mDesc != null && !mMovie.mDesc.isEmpty()) {
                             mDataSetTypes.add(0);
                         }
                         mDataSetTypes.add(1);
-                        mDataSetTypes.add(2);
-                        String mBackdropPath = mMovieInfo.mBackdropPath;
-                        String mName = mMovieInfo.mName;
+                        if(mMovie.mRating != 0) {
+                            mDataSetTypes.add(2);
+                        }
+                        String mBackdropPath = mMovie.mBackdropPath;
+                        String mName = mMovie.mName;
                         CollapsingToolbarLayout collapsingToolbar =
                                 (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
                         collapsingToolbar.setTitle(mName);
@@ -89,6 +73,9 @@ public class DetailActivityFragment extends Fragment {
                                 .tag(getActivity())
                                 .into(backdropView);
                         mAdapter.notifyDataSetChanged();
+                    } else { // Connect or Socket Exception
+                        Toast.makeText(getActivity(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
+                        getActivity().finish();
                     }
                 }
             }
@@ -97,6 +84,6 @@ public class DetailActivityFragment extends Fragment {
     }
 
     public interface FragmentCallback {
-        void onTaskDone(int i);
+        void onTaskDone(boolean result);
     }
 }

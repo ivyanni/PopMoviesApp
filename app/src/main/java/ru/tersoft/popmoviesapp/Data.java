@@ -9,35 +9,31 @@ final class Data {
         Array of MovieInfo elements and all operations with it
     */
 
-    static final List<MovieInfo> Movies = new ArrayList<>();
-    static Locale locale;
+    private static List<MovieInfo> sMovies = new ArrayList<>();
+    private static Locale sLocale;
 
     public Data() {
     }
 
-    public static final void setLocale(Locale newLocale) {
-        locale = newLocale;
+    static void setLocale(Locale newLocale) {
+        sLocale = newLocale;
     }
-
-    public static final Locale getLocale() {
-        return locale;
+    static Locale getLocale() { return sLocale; }
+    static void addMovie(MovieInfo movie) {
+        sMovies.add(movie);
     }
-
-    public static final void addMovie(MovieInfo movie) {
-        Movies.add(movie);
+    static MovieInfo getMovie(int id) { return sMovies.get(id); }
+    static void removeAllMovies() { sMovies.clear(); }
+    static int getMoviesNum() {
+        return sMovies.size();
     }
-
-    public static final int getMoviesNum() {
-        return Movies.size();
-    }
-
-    public static final List<String> getMoviesPaths() {
-        List<String> paths = new ArrayList<>();
-        if(Movies.size() != 0) {
-            for (MovieInfo m : Movies) {
-                paths.add(m.mCoverPath);
+    static List<String> getCoverPaths() {
+        List<String> coverPaths = new ArrayList<>();
+        if(getMoviesNum() != 0) {
+            for (MovieInfo m : sMovies) {
+                coverPaths.add(m.mCoverPath);
             }
         }
-        return paths;
+        return coverPaths;
     }
 }
