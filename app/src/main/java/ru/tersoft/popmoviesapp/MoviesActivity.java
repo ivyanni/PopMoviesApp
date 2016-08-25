@@ -92,7 +92,7 @@ public class MoviesActivity extends AppCompatActivity {
                     mEditor.apply();
                     final MoviesActivityFragment moviesFragment =
                             (MoviesActivityFragment) getSupportFragmentManager().findFragmentById(R.id.moviesFragment);
-                    Object[] params = {getResources().getString(R.string.api_key), selectedPosition, 1};
+                    Object[] params = {selectedPosition, 1};
                     // Remove old posters and load new
                     Data.removeAllMovies();
                     moviesFragment.movieList.smoothScrollToPosition(0);

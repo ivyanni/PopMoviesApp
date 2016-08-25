@@ -49,7 +49,7 @@ public class MoviesActivityFragment extends Fragment {
                         currentPage = page;
                         int mSortMethod = getActivity().getPreferences(Context.MODE_PRIVATE)
                                 .getInt("sort_method", 0);
-                        Object[] params = {getResources().getString(R.string.api_key), mSortMethod, currentPage};
+                        Object[] params = {mSortMethod, currentPage};
                         loadMovies(params);
                         return true;
             }
@@ -63,10 +63,10 @@ public class MoviesActivityFragment extends Fragment {
             }
         });
         if(Data.getMoviesNum() == 0) {
-            // Parameters: 0 - api key (string), 1 - sort method (int), 2 - current page (int)
+            // Parameters: 0 - sort method (int), 1 - current page (int)
             // API key stored in strings.xml. Get your api key here: https://www.themoviedb.org/account/signup
             int mSortMethod = getActivity().getPreferences(Context.MODE_PRIVATE).getInt("sort_method", 0);
-            Object[] params = {getResources().getString(R.string.api_key), mSortMethod, 1};
+            Object[] params = {mSortMethod, 1};
             loadMovies(params);
         }
         return v;
@@ -91,7 +91,8 @@ public class MoviesActivityFragment extends Fragment {
             public void onTaskDone(boolean result) {
                 if(getActivity() != null) {
                     if (!result) { // Connect or Socket Exception
-                        Toast.makeText(getActivity(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getResources().getString(R.string.noconnection),
+                                Toast.LENGTH_SHORT).show();
                         getActivity().finish();
                     } else adapter.refreshData();
                 }

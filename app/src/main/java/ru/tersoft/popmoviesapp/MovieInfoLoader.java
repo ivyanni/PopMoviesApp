@@ -27,10 +27,10 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
     }
 
     protected Boolean doInBackground(Object... params) {
-        // Parameters: 0 - api key (string), 1 - movie position (int)
-        mMovie = Data.getMovie((int)params[1]);
+        // Parameters: 0 - movie position (int)
+        mMovie = Data.getMovie((int)params[0]);
         String dataUrl = "http://api.themoviedb.org/3/movie/" + mMovie.mId + "?";
-        String dataUrlParameters = "api_key=" + params[0] +
+        String dataUrlParameters = "api_key=" + BuildConfig.TMDB_API_KEY +
                 "&language=" + Data.getLocale().getLanguage() +
                 "&append_to_response=releases";
 

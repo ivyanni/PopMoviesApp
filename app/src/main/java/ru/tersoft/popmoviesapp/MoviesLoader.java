@@ -23,8 +23,8 @@ public class MoviesLoader extends AsyncTask<Object, Object, Boolean> {
     }
 
     protected Boolean doInBackground(Object... params) {
-        int currentPage = (int) params[2];
-        int sortMethod = (int) params[1];
+        int sortMethod = (int) params[0];
+        int currentPage = (int) params[1];
         String dataUrl;
 
         switch(sortMethod) {
@@ -35,10 +35,10 @@ public class MoviesLoader extends AsyncTask<Object, Object, Boolean> {
                 dataUrl = "http://api.themoviedb.org/3/movie/popular?";
                 break;
         }
-        // Parameters: 0 - api key (string), 1 - sort method (int), 2 - current page (int)
-        String dataUrlParameters = "api_key=" + params[0] + "&page=" +
-                currentPage + "&language=" +
-                Data.getLocale().getLanguage();
+        // Parameters: 0 - sort method (int), 1 - current page (int)
+        String dataUrlParameters = "api_key=" + BuildConfig.TMDB_API_KEY +
+                "&page=" + currentPage +
+                "&language=" + Data.getLocale().getLanguage();
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
             mConnection = (HttpURLConnection) url.openConnection();

@@ -37,9 +37,9 @@ public class DetailActivityFragment extends Fragment {
             mRecyclerView.setLayoutManager(mLayoutManager);
             mAdapter = new MovieInfoAdapter(pos, mDataSetTypes, getActivity());
             mRecyclerView.setAdapter(mAdapter);
-            // Parameters: 0 - api key (string), 1 - movie position (int)
-            Object[] params = {getResources().getString(R.string.api_key), pos};
-            loadMovieInfo(params);
+       /*     // Parameters: 0 - movie position (int)
+            Object[] params = {pos};*/
+            loadMovieInfo(pos);
         }
         return v;
     }
