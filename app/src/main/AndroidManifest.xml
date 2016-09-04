@@ -21,7 +21,6 @@
         </activity>
         <activity
             android:name=".DetailActivity"
-            android:label=" "
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

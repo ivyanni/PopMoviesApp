@@ -1,6 +1,8 @@
 package ru.tersoft.popmoviesapp;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +25,13 @@ public class DetailActivity extends AppCompatActivity {
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        Typeface myTypeface = Typeface.create("sans-serif-condensed", Typeface.BOLD);
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ToolbarTitle);
+        collapsingToolbar.setCollapsedTitleTypeface(myTypeface);
+        collapsingToolbar.setExpandedTitleTypeface(myTypeface);
         // Set toolbar back icon
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

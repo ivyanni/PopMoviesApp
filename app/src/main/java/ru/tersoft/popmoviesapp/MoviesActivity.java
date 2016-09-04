@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -41,7 +43,11 @@ public class MoviesActivity extends AppCompatActivity implements MoviesFragment.
         setContentView(R.layout.activity_movies);
         Data.setLocale(Locale.getDefault()); // Get device's locale
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Typeface myTypeface = Typeface.create("sans-serif-condensed", Typeface.BOLD);
+        toolbarTitle.setTypeface(myTypeface);
         // Checking active internet mConnection
         if(!isOnline()) {
             Toast.makeText(this, getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();
