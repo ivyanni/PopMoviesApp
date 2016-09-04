@@ -6,7 +6,8 @@
 > Popular Movies Application - Final Project of [Udacity "Developing Android Apps"](https://www.udacity.com/course/developing-android-apps--ud853) course.  
 > This is an Android application that allows users to discover the most popular movies playing.
 
-<img src="http://i.imgur.com/N0oGM2m.gif" width="250" alt="App in work" />
+<img src="http://i.imgur.com/N0oGM2m.gif" height="445" alt="App in work" />
+<img src="http://i.imgur.com/22XXFju.jpg" height="445" alt="Tablet UI" />
 ## Features
 
 - Sort by popularity and rating  
