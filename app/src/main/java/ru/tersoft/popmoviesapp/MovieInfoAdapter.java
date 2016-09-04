@@ -2,6 +2,7 @@ package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,10 +81,12 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
 
     private class HeaderViewHolder extends ViewHolder {
         ImageView headerImageView;
+        TextView headerTextView;
 
         HeaderViewHolder(View v) {
             super(v);
             this.headerImageView = (ImageView) v.findViewById(R.id.headerImage);
+            this.headerTextView = (TextView) v.findViewById(R.id.headerText);
         }
     }
 
@@ -199,11 +202,24 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
             }
         } else if(viewHolder.getItemViewType() == HEADER) {
             HeaderViewHolder headerHolder = (HeaderViewHolder) viewHolder;
+            final TextView holderText = headerHolder.headerTextView;
             Picasso.with(mContext)
                     .load(Data.getMovie(mMoviePosition).mBackdropPath)
                     .config(Bitmap.Config.RGB_565)
                     .tag(mContext)
-                    .into(headerHolder.headerImageView);
+                    .into(headerHolder.headerImageView, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                holderText.setText(Data.getMovie(mMoviePosition).mName);
+                                Typeface myTypeface = Typeface.create("sans-serif-condensed", Typeface.BOLD);
+                                holderText.setTypeface(myTypeface);
+                            }
+
+                            @Override
+                            public void onError() {
+                                // Do nothing
+                            }
+                        });
         }
     }
 
