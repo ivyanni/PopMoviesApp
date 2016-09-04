@@ -14,15 +14,15 @@ import java.util.List;
 
 public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
     /*
-    AsyncTask that loads all needed movie info and makes a callback to DetailActivityFragment
+    AsyncTask that loads all needed movie info and makes a callback to DetailFragment
     */
 
     private HttpURLConnection mConnection;
     private MovieInfo mMovie;
 
-    private DetailActivityFragment.FragmentCallback mFragmentCallback;
+    private DetailFragment.FragmentCallback mFragmentCallback;
 
-    MovieInfoLoader(DetailActivityFragment.FragmentCallback fragmentCallback) {
+    MovieInfoLoader(DetailFragment.FragmentCallback fragmentCallback) {
         mFragmentCallback = fragmentCallback;
     }
 

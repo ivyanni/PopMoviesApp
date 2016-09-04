@@ -11,14 +11,14 @@ import java.net.URL;
 
 public class MoviesLoader extends AsyncTask<Object, Object, Boolean> {
     /*
-    AsyncTask that loads new content from page and makes a callback to MoviesActivityFragment
+    AsyncTask that loads new content from page and makes a callback to MoviesFragment
     */
 
     private HttpURLConnection mConnection;
 
-    private MoviesActivityFragment.FragmentCallback mFragmentCallback;
+    private MoviesFragment.FragmentCallback mFragmentCallback;
 
-    MoviesLoader(MoviesActivityFragment.FragmentCallback fragmentCallback) {
+    MoviesLoader(MoviesFragment.FragmentCallback fragmentCallback) {
         mFragmentCallback = fragmentCallback;
     }
 

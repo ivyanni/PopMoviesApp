@@ -27,6 +27,7 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     private static final int DESC = 0; // Description
     private static final int INFO = 1; // Movie additional info
     private static final int RATING = 2; // Movie rating
+    private static final int HEADER = 3; // Header image for two-pane UI
 
     MovieInfoAdapter(int movieId, List<Integer> dataSetTypes, Context context) {
         mMoviePosition = movieId;
@@ -77,6 +78,15 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
         }
     }
 
+    private class HeaderViewHolder extends ViewHolder {
+        ImageView headerImageView;
+
+        HeaderViewHolder(View v) {
+            super(v);
+            this.headerImageView = (ImageView) v.findViewById(R.id.headerImage);
+        }
+    }
+
     @Override
     public long getItemId(int position) {
         return position;
@@ -85,22 +95,26 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v;
-        if (viewType == DESC) {
-            v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.desc_card, viewGroup, false);
-            return new DescriptionViewHolder(v);
+        switch (viewType) {
+            case DESC:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.desc_card, viewGroup, false);
+                return new DescriptionViewHolder(v);
+            case RATING:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.rating_card, viewGroup, false);
+                return new RatingViewHolder(v);
+            case INFO:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.info_card, viewGroup, false);
+                return new InfoViewHolder(v);
+            case HEADER:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.header_image, viewGroup, false);
+                return new HeaderViewHolder(v);
+            default:
+                return null;
         }
-        if (viewType == RATING) {
-            v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.rating_card, viewGroup, false);
-            return new RatingViewHolder(v);
-        }
-        if (viewType == INFO) {
-            v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.info_card, viewGroup, false);
-            return new InfoViewHolder(v);
-        }
-        else return null;
     }
 
     @Override
@@ -183,6 +197,13 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
                 sb.append(Data.getMovie(mMoviePosition).mGenres.get(i));
                 infoHolder.genresTextView.setText(sb.toString());
             }
+        } else if(viewHolder.getItemViewType() == HEADER) {
+            HeaderViewHolder headerHolder = (HeaderViewHolder) viewHolder;
+            Picasso.with(mContext)
+                    .load(Data.getMovie(mMoviePosition).mBackdropPath)
+                    .config(Bitmap.Config.RGB_565)
+                    .tag(mContext)
+                    .into(headerHolder.headerImageView);
         }
     }
 

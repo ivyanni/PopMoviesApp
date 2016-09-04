@@ -11,6 +11,8 @@ final class Data {
 
     private static List<MovieInfo> sMovies = new ArrayList<>();
     private static Locale sLocale;
+    private static boolean mTwoPane = false;
+    private static int mPosition = -1;
 
     public Data() {
     }
@@ -35,5 +37,21 @@ final class Data {
             }
         }
         return coverPaths;
+    }
+
+    public static boolean isTwoPane() {
+        return mTwoPane;
+    }
+
+    public static void setTwoPane(boolean twoPane) {
+        mTwoPane = twoPane;
+    }
+
+    public static int getPosition() {
+        return mPosition;
+    }
+
+    public static void setPosition(int mPosition) {
+        Data.mPosition = mPosition;
     }
 }

@@ -17,35 +17,38 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivityFragment extends Fragment {
+public class DetailFragment extends Fragment {
     private MovieInfo mMovie;
     private MovieInfoAdapter mAdapter;
     private List<Integer> mDataSetTypes = new ArrayList<>(); // CardView order
     View v;
+
+    public static DetailFragment newInstance() {
+        DetailFragment fragmentDemo = new DetailFragment();
+        return fragmentDemo;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_detail, container, false);
         RecyclerView mRecyclerView = (RecyclerView) v.findViewById(R.id.mainView);
-        // Get position in GridView of selected movie
-        Bundle args = getArguments();
-        if (args != null) {
-            int pos = getArguments().getInt("position");
-            mMovie = Data.getMovie(pos);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new MovieInfoAdapter(pos, mDataSetTypes, getActivity());
-            mRecyclerView.setAdapter(mAdapter);
-       /*     // Parameters: 0 - movie position (int)
-            Object[] params = {pos};*/
-            loadMovieInfo(pos);
-        }
+        mMovie = Data.getMovie(Data.getPosition());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new MovieInfoAdapter(Data.getPosition(), mDataSetTypes, getActivity());
+        mRecyclerView.setAdapter(mAdapter);
+        loadMovieInfo(Data.getPosition());
         return v;
     }
 
     private void loadMovieInfo(Object... params) {
-        MovieInfoLoader testAsyncTask = new MovieInfoLoader(new DetailActivityFragment.FragmentCallback() {
+        MovieInfoLoader testAsyncTask = new MovieInfoLoader(new DetailFragment.FragmentCallback() {
             @Override
             public void onTaskDone(boolean result) {
                 // Callback from MovieInfoLoader task
@@ -53,6 +56,9 @@ public class DetailActivityFragment extends Fragment {
                     if(result) {
                         // Set CardView order
                         mDataSetTypes.clear();
+                        if(Data.isTwoPane()) {
+                            mDataSetTypes.add(3);
+                        }
                         if (mMovie.mDesc != null && !mMovie.mDesc.isEmpty()) {
                             mDataSetTypes.add(0);
                         }
@@ -62,16 +68,19 @@ public class DetailActivityFragment extends Fragment {
                         }
                         String mBackdropPath = mMovie.mBackdropPath;
                         String mName = mMovie.mName;
-                        CollapsingToolbarLayout collapsingToolbar =
-                                (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
-                        collapsingToolbar.setTitle(mName);
-                        // Load backdrop image to toolbar
-                        ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
-                        Picasso.with(getActivity())
-                                .load(mBackdropPath)
-                                .config(Bitmap.Config.RGB_565)
-                                .tag(getActivity())
-                                .into(backdropView);
+                        if(getActivity().findViewById(R.id.collapsing_toolbar) != null) {
+                            // In two-pane mode we don't have collapsing toolbar
+                            CollapsingToolbarLayout collapsingToolbar =
+                                    (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar);
+                            collapsingToolbar.setTitle(mName);
+                            // Load backdrop image to toolbar
+                            ImageView backdropView = (ImageView) getActivity().findViewById(R.id.backdropView);
+                            Picasso.with(getActivity())
+                                    .load(mBackdropPath)
+                                    .config(Bitmap.Config.RGB_565)
+                                    .tag(getActivity())
+                                    .into(backdropView);
+                        }
                         mAdapter.notifyDataSetChanged();
                     } else { // Connect or Socket Exception
                         Toast.makeText(getActivity(), getResources().getString(R.string.noconnection), Toast.LENGTH_SHORT).show();

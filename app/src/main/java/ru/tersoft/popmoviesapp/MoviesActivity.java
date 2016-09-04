@@ -2,26 +2,30 @@ package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.util.Locale;
 
-public class MoviesActivity extends AppCompatActivity {
+public class MoviesActivity extends AppCompatActivity implements MoviesFragment.OnGridItemSelectedListener {
     private SharedPreferences sPref;
     private static final String SORT_METHOD = "sort_method";
     private Integer mSortMethod;
     private Fragment mFragment;
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -46,13 +50,25 @@ public class MoviesActivity extends AppCompatActivity {
         sPref = getPreferences(MODE_PRIVATE);
         mSortMethod = sPref.getInt(SORT_METHOD, 0);
         // Check configuration changes
+        determinePaneLayout();
         if (savedInstanceState == null) {
-            MoviesActivityFragment mFragment = new MoviesActivityFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.moviesFragment, mFragment, "movies_fragment").commit();
+                MoviesFragment mFragment = new MoviesFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.moviesFragment, mFragment, "movies_fragment")
+                        .commit();
         }
         else {
-            mFragment = getSupportFragmentManager().getFragment(savedInstanceState, "movies_fragment");
+            mFragment = getSupportFragmentManager()
+                    .getFragment(savedInstanceState, "movies_fragment");
         }
+    }
+
+    // Two-pane mode checking
+    private void determinePaneLayout() {
+        FrameLayout fragmentDetail = (FrameLayout) findViewById(R.id.detailFragment);
+        if (fragmentDetail != null) {
+            Data.setTwoPane(true);
+        } else Data.setTwoPane(false);
     }
 
     @Override
@@ -90,13 +106,15 @@ public class MoviesActivity extends AppCompatActivity {
                     SharedPreferences.Editor mEditor = sPref.edit();
                     mEditor.putInt(SORT_METHOD, selectedPosition);
                     mEditor.apply();
-                    final MoviesActivityFragment moviesFragment =
-                            (MoviesActivityFragment) getSupportFragmentManager().findFragmentById(R.id.moviesFragment);
+                    final MoviesFragment moviesFragment =
+                            (MoviesFragment) getSupportFragmentManager()
+                                    .findFragmentById(R.id.moviesFragment);
                     Object[] params = {selectedPosition, 1};
                     // Remove old posters and load new
                     Data.removeAllMovies();
+                    Data.setPosition(-1);
                     moviesFragment.movieList.smoothScrollToPosition(0);
-                    new MoviesLoader(new MoviesActivityFragment.FragmentCallback() {
+                    new MoviesLoader(new MoviesFragment.FragmentCallback() {
                         @Override
                         public void onTaskDone(boolean result) {
                             if(!result) { // SocketTimeoutException
@@ -106,6 +124,13 @@ public class MoviesActivity extends AppCompatActivity {
                             else moviesFragment.adapter.refreshData();
                         }
                     }).execute(params);
+                    if(Data.isTwoPane()) {
+                        DetailFragment fragmentItem =
+                                (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.remove(fragmentItem);
+                        ft.commit();
+                    }
                 }
             }
         });
@@ -123,5 +148,22 @@ public class MoviesActivity extends AppCompatActivity {
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    @Override
+    public void onItemSelected(int position) {
+        Data.setPosition(position);
+        if (Data.isTwoPane()) {
+            // Single activity with list and detail
+            DetailFragment fragmentItem;
+            fragmentItem = DetailFragment.newInstance();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.detailFragment, fragmentItem, DETAILFRAGMENT_TAG);
+            ft.commit();
+        } else {
+            // Separate activity
+            Intent i = new Intent(this, DetailActivity.class);
+            startActivity(i);
+        }
     }
 }

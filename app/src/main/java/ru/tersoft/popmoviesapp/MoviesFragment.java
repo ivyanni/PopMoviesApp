@@ -1,7 +1,6 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -12,12 +11,17 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-public class MoviesActivityFragment extends Fragment {
+public class MoviesFragment extends Fragment {
 
     public MovieListAdapter adapter;
     public int currentPage;
     private Parcelable state;
     public GridView movieList;
+    private OnGridItemSelectedListener listener;
+
+    public interface OnGridItemSelectedListener {
+        void onItemSelected(int position);
+    }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
@@ -38,10 +42,12 @@ public class MoviesActivityFragment extends Fragment {
             currentPage = savedInstanceState.getInt("current_page");
         }
         else currentPage = 1;
-
         adapter = new MovieListAdapter(getActivity());
         movieList = (GridView) v.findViewById(R.id.movielist);
         movieList.setAdapter(adapter);
+        if(Data.getPosition() != -1) {
+            movieList.smoothScrollByOffset(Data.getPosition());
+        }
         movieList.setOnScrollListener(new GridScrollListener(3, currentPage, getActivity()) {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
@@ -56,10 +62,9 @@ public class MoviesActivityFragment extends Fragment {
         });
         movieList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-                detailIntent.putExtra("position", i);
-                startActivity(detailIntent);
+            public void onItemClick(AdapterView<?> adapterView, View item,
+                                    int position, long rowId) {
+                listener.onItemSelected(position);
             }
         });
         if(Data.getMoviesNum() == 0) {
@@ -70,6 +75,18 @@ public class MoviesActivityFragment extends Fragment {
             loadMovies(params);
         }
         return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnGridItemSelectedListener) {
+            listener = (OnGridItemSelectedListener) context;
+        } else {
+            throw new ClassCastException(
+                    context.toString()
+                            + " must implement MoviesFragment.OnGridItemSelectedListener");
+        }
     }
 
     @Override

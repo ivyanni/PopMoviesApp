@@ -4,9 +4,8 @@
     android:id="@+id/content_movies"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.tersoft.popmoviesapp.MoviesActivityFragment"
+    tools:context="ru.tersoft.popmoviesapp.MoviesFragment"
     tools:showIn="@layout/activity_movies">
-
 
     <GridView
         android:layout_width="match_parent"
