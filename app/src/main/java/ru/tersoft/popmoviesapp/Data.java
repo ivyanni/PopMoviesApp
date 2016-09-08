@@ -1,5 +1,7 @@
 package ru.tersoft.popmoviesapp;
 
+import android.widget.ArrayAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +15,8 @@ final class Data {
     private static Locale sLocale;
     private static boolean mTwoPane = false;
     private static int mPosition = -1;
+    public static ArrayAdapter<String> mTrailerAdapter;
+    public static int lastCardIndex;
 
     public Data() {
     }

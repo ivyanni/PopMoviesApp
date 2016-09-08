@@ -32,7 +32,7 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
         String dataUrl = "http://api.themoviedb.org/3/movie/" + mMovie.mId + "?";
         String dataUrlParameters = "api_key=" + BuildConfig.TMDB_API_KEY +
                 "&language=" + Data.getLocale().getLanguage() +
-                "&append_to_response=releases";
+                "&append_to_response=releases,videos,reviews";
 
         try {
             URL url = new URL(dataUrl + dataUrlParameters);
@@ -70,6 +70,7 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
         long budget = 0;
         List<String> genres = new ArrayList<>();
         boolean isLocal = false;
+        List<Trailer> videos = new ArrayList<>();
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -141,7 +142,12 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
                                 isLocal = true;
                             }
                         } else reader.skipValue();
-
+                        break;
+                    case "videos":
+                        // Movie available trailers
+                        if (reader.peek() != JsonToken.NULL) {
+                            videos = readVideos(reader);
+                        } else reader.skipValue();
                         break;
                     default:
                         reader.skipValue();
@@ -153,7 +159,7 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
         }
         reader.endObject();
         mMovie.addData(movieName, desc, backdropPath, date, isLocal,
-                (float)rating, budget, runtime, genres, home);
+                (float)rating, budget, runtime, genres, home, videos);
     }
 
     private List<String> readGenres(JsonReader reader) throws IOException {
@@ -191,7 +197,6 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
 
             if(reader.peek() != JsonToken.NULL) {
                 reader.beginObject();
-                label:
                 while (reader.hasNext()) {
 
                     String name = reader.nextName();
@@ -207,7 +212,7 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
                             if (countryCode != null) {
                                 if (reader.peek() != JsonToken.NULL && countryCode.equals(Data.getLocale().getCountry())) {
                                     releaseDate = reader.nextString();
-                                    break label;
+                                    break;
                                 } else reader.skipValue();
                             }
                             break;
@@ -226,5 +231,51 @@ public class MovieInfoLoader extends AsyncTask<Object, Object, Boolean> {
         reader.endObject();
 
         return releaseDate;
+    }
+
+    private List<Trailer> readVideos(JsonReader reader) throws IOException {
+        List<String> videoNames = new ArrayList<>();
+        List<String> videoUrls = new ArrayList<>();
+        List<Trailer> videos = new ArrayList<>();
+
+        reader.beginObject();
+        reader.nextName();
+        reader.beginArray();
+        while (reader.hasNext()) {
+
+            if(reader.peek() != JsonToken.NULL) {
+                reader.beginObject();
+                while (reader.hasNext()) {
+
+                    String name = reader.nextName();
+                    switch (name) {
+                        case "key":
+                            if (reader.peek() != JsonToken.NULL) {
+                                videoUrls.add(reader.nextString());
+                            } else reader.skipValue();
+                            break;
+                        case "name":
+                            if (reader.peek() != JsonToken.NULL) {
+                                videoNames.add(reader.nextString());
+                            } else reader.skipValue();
+                            break;
+                        default:
+                            reader.skipValue();
+                            break;
+                    }
+
+                }
+                reader.endObject();
+
+            } else reader.skipValue();
+
+        }
+        reader.endArray();
+        reader.endObject();
+
+        for(int i = 0; i < videoNames.size(); i++) {
+            videos.add(new Trailer(videoUrls.get(i), videoNames.get(i)));
+        }
+        return videos;
     }
 }

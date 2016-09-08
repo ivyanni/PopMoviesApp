@@ -14,5 +14,6 @@
     <string name="hour_abb">h</string>
     <string name="minute_abb">m</string>
     <string name="thousands_abb">k</string>
+    <string name="movies">Trailers</string>
     <string name="noconnection">This app requires an active Internet connection. Check your connection and restart an application.</string>
 </resources>

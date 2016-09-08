@@ -21,6 +21,8 @@ public class MovieInfo {
     int mRuntime, mRuntimeExt;
     long mId, mBudget, mBudgetExt;
     List<String> mGenres = new ArrayList<>();
+    List<Trailer> mTrailers = new ArrayList<>();
+    List<String> mTrailerNames = new ArrayList<>();
 
     MovieInfo(long id, String coverPath) {
         mId = id;
@@ -41,7 +43,10 @@ public class MovieInfo {
         }
     }
 
-    void addData(String name, String desc, String backdrop, String date, boolean isLocal, float rating, long budget, int runtime, List<String> genres, String home) {
+    void addData(String name, String desc, String backdrop,
+                 String date, boolean isLocal, float rating,
+                 long budget, int runtime, List<String> genres,
+                 String home, List<Trailer> trailers) {
         mName = name; mDesc = desc;
         mBackdropPath = BACK_BASE + backdrop;
         mIsLocal = isLocal;
@@ -51,5 +56,10 @@ public class MovieInfo {
         mBudget = budget / 1000000; mBudgetExt = (budget % 1000000) / 1000;
         mGenres = genres;
         mHome = home;
+        for(int i = 0; i < trailers.size(); i++) {
+            mTrailers.add(new Trailer("https://www.youtube.com/watch?v="
+                    + trailers.get(i).getTrailerUrl(), trailers.get(i).getTrailerName()));
+            mTrailerNames.add(trailers.get(i).getTrailerName());
+        }
     }
 }

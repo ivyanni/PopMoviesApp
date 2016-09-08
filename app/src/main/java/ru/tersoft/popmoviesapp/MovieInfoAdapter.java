@@ -1,14 +1,18 @@
 package ru.tersoft.popmoviesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -29,6 +33,7 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
     private static final int INFO = 1; // Movie additional info
     private static final int RATING = 2; // Movie rating
     private static final int HEADER = 3; // Header image for two-pane UI
+    private static final int TRAILERS = 4; // Trailers list
 
     MovieInfoAdapter(int movieId, List<Integer> dataSetTypes, Context context) {
         mMoviePosition = movieId;
@@ -47,6 +52,23 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
         DescriptionViewHolder(View v) {
             super(v);
             this.temp = (TextView) v.findViewById(R.id.desc);
+        }
+    }
+
+    private class TrailerViewHolder extends ViewHolder {
+        ListView trailersList;
+
+        TrailerViewHolder(View v) {
+            super(v);
+            trailersList = (ListView) v.findViewById(R.id.trailersList);
+            trailersList.setAdapter(Data.mTrailerAdapter);
+            trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    mContext.startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(Data.getMovie(mMoviePosition).mTrailers.get(i).getTrailerUrl())));
+                }
+            });
         }
     }
 
@@ -115,6 +137,10 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.header_image, viewGroup, false);
                 return new HeaderViewHolder(v);
+            case TRAILERS:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.movies_card, viewGroup, false);
+                return new TrailerViewHolder(v);
             default:
                 return null;
         }
@@ -220,6 +246,8 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
                                 // Do nothing
                             }
                         });
+        } else if(viewHolder.getItemViewType() == TRAILERS) {
+            Data.mTrailerAdapter.notifyDataSetChanged();
         }
     }
 

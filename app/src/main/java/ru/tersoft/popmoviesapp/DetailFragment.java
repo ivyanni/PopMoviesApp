@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -44,6 +45,8 @@ public class DetailFragment extends Fragment {
         mAdapter = new MovieInfoAdapter(Data.getPosition(), mDataSetTypes, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         loadMovieInfo(Data.getPosition());
+        Data.mTrailerAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.movies_list_item, R.id.movieName, mMovie.mTrailerNames);
         return v;
     }
 
@@ -63,8 +66,14 @@ public class DetailFragment extends Fragment {
                             mDataSetTypes.add(0);
                         }
                         mDataSetTypes.add(1);
+                        Data.lastCardIndex = 1;
                         if(mMovie.mRating != 0) {
                             mDataSetTypes.add(2);
+                            Data.lastCardIndex = 2;
+                        }
+                        if(mMovie.mTrailers.size() > 0) {
+                            mDataSetTypes.add(4);
+                            Data.lastCardIndex = 4;
                         }
                         String mBackdropPath = mMovie.mBackdropPath;
                         String mName = mMovie.mName;
