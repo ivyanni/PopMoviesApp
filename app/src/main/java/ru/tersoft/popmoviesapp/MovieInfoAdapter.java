@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,10 +130,32 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.View
             case RATING:
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.rating_card, viewGroup, false);
+                if(Data.lastCardIndex == RATING) {
+                    CardView cardView = (CardView) v.findViewById(R.id.cardView);
+                    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cardView.getLayoutParams();
+                    int px = (int) TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            16,
+                            mContext.getResources().getDisplayMetrics()
+                    );
+                    params.setMargins(px, px, px, px);
+                    cardView.setLayoutParams(params);
+                }
                 return new RatingViewHolder(v);
             case INFO:
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.info_card, viewGroup, false);
+                if(Data.lastCardIndex == INFO) {
+                    CardView cardView = (CardView) v.findViewById(R.id.cardView);
+                    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cardView.getLayoutParams();
+                    int px = (int) TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            16,
+                            mContext.getResources().getDisplayMetrics()
+                    );
+                    params.setMargins(px, px, px, px);
+                    cardView.setLayoutParams(params);
+                }
                 return new InfoViewHolder(v);
             case HEADER:
                 v = LayoutInflater.from(viewGroup.getContext())
